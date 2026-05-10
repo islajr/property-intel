@@ -1,6 +1,7 @@
 package io.propertyintel.api.search;
 
 import io.propertyintel.api.listing.ListingService;
+import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ public class SearchService {
 
     private final ListingService listingService;
 
-    public ResponseEntity<?> performSearch(ListingSearchParams params) {
+    public ResponseEntity<ListingResponse> performSearch(ListingSearchParams params) {
         /* Delegates to listing search for now as spec details similar features */
         return listingService.getListings(params);
     }
