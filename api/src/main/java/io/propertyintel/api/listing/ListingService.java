@@ -1,12 +1,12 @@
 package io.propertyintel.api.listing;
 
+import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
 import io.propertyintel.api.listing.mapper.ListingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +21,7 @@ import static io.propertyintel.api.listing.ListingSpecifications.*;
 public class ListingService {
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
+    private final RepositoryUtils repositoryUtils;
 
     public ResponseEntity<ListingDetailResponse> getListing(Long id) {
 
@@ -48,7 +49,7 @@ public class ListingService {
 
 
         Sort sort = resolveSort(searchParams.getSort());
-        Pageable pageable = buildPageable(searchParams.getLimit(), sort, searchParams.getPage());
+        Pageable pageable = repositoryUtils.buildPageable(searchParams.getLimit(), sort, searchParams.getPage());
 
         Page<Listing> listingPage = listingRepository.findAll(spec, pageable);
 
@@ -57,7 +58,7 @@ public class ListingService {
 
     }
 
-    private Sort resolveSort(String sort) {
+    public Sort resolveSort(String sort) {
         return switch (sort == null ? "newest" : sort) {
             case "price_asc" -> Sort.by(Sort.Direction.ASC, "priceKobo");
             case "price_desc" -> Sort.by(Sort.Direction.DESC, "priceKobo");
@@ -67,10 +68,5 @@ public class ListingService {
                     "Invalid sort option: %s. Valid options: price_asc, price_desc, newest, days_asc".formatted(sort)
             );  // TODO: remember to handle exceptions properly
         };
-    }
-
-    private Pageable buildPageable(Integer limit, Sort sort, Integer pageNumber) {
-        int size = (limit != null && limit > 0) ? limit : 20;   // default value
-        return PageRequest.of(pageNumber, size, sort);
     }
 }
