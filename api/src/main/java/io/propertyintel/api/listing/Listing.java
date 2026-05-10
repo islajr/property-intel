@@ -1,8 +1,10 @@
 package io.propertyintel.api.listing;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.jspecify.annotations.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
