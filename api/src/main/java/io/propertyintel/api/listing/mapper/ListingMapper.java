@@ -14,7 +14,7 @@ public interface ListingMapper {
     @Mapping(source = ".", target = "meta")
     ListingResponse toResponse(Page<Listing> listings);
 
-    @Mapping(target = "priceFormatted", expression = "java(listing.getPriceKobo() / 100)")
+    @Mapping(target = "priceFormatted", expression = "java(String.valueOf(listing.getPriceKobo() / 100))")
     ListingData toListingData(Listing listing);
 
     @Mapping(source = "totalElements", target = "count")
@@ -25,7 +25,7 @@ public interface ListingMapper {
     ListingResponseMeta toMeta(Page<?> page);
 
     @Mapping(source = "priceHistory", target = "listingHistory")
-    @Mapping(target = "priceFormatted", expression = "java(listing.getPriceKobo() / 100)")
+    @Mapping(target = "priceFormatted", expression = "java(String.valueOf(listing.getPriceKobo() / 100))")
     ListingDetailResponse toDetailResponse(Listing listing);
 
     PriceHistoryResponse toPriceHistoryResponse(PriceHistory priceHistory);
