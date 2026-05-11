@@ -1,5 +1,6 @@
 package io.propertyintel.api.market;
 
+import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
 import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
@@ -25,13 +26,14 @@ public class MarketService {
 
         Page<Market> markets = marketRepository.findAll(pageable);
 
+        if (markets.isEmpty()) throw new ResourceNotFoundException("No market neighbourhoods found");
+
         return(ResponseEntity.ok(marketMapper.toPaginatedResponse(markets)));
     }
 
     public ResponseEntity<NeighbourhoodStatsResponse> getNeighbourhoodStats(String neighbourhood) {
-        Market market = marketRepository.findByNeighbourhood(neighbourhood);
-
-        if(market == null) return ResponseEntity.notFound().build();
+        Market market = marketRepository.findByNeighbourhood(neighbourhood).orElseThrow(
+                () -> new ResourceNotFoundException("Neighbourhood not found"));
 
         return (ResponseEntity.ok(marketMapper.toStatsResponse(market)));
 
@@ -47,7 +49,7 @@ public class MarketService {
             case "active_listings" -> Sort.by(Sort.Direction.DESC, "activeListingCount");
             default -> throw new IllegalArgumentException(
                     "Invalid sort option: %s. Valid options: neighbourhood, new_listings, price_reduced, median_price, active_listings".formatted(sort)
-            );  // TODO: remember to handle exceptions properly
+            );  //
         };
     }
 

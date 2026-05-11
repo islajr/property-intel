@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MarketRepository extends JpaRepository<Market, String> {
 
-    Market findByNeighbourhood(String neighbourhood);
+    Optional<Market> findByNeighbourhood(String neighbourhood);
     List<Market> findByCity(String city);
     List<Market> findByCityAndNeighbourhood(String city, String neighbourhood);
 
