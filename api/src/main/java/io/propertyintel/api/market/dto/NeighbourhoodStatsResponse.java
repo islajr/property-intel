@@ -20,11 +20,14 @@ public record NeighbourhoodStatsResponse(
         @Schema(description = "Active listing count within neighbourhood", example = "25")
         Integer activeListingCount,
 
+        @Schema(description = "Average days on market for listings in neighbourhood", example = "10.4")
+        Double avgDaysOnMarket,
+
         @Schema(description = "New listings in current week", example = "10")
-        Integer newListingsThisWeek,
+        Integer newListingsCount,
 
         @Schema(description = "Listings with reduced prices this week", example = "54")
-        Integer priceReducedThisWeek,
+        Integer priceReducedCount,
 
         @Schema(description = "Market percentile values")
         MarketPercentiles pricePercentiles
