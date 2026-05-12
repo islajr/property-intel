@@ -5,11 +5,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Immutable;
+
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
-@Immutable
-@Table(schema = "raw_data", name = "market_snapshot_view")
+@Table(schema = "market", name = "neighbourhood_snapshots")
 @Getter
 @Setter
 public class Market {
@@ -18,10 +19,13 @@ public class Market {
     private String id;
     private String neighbourhood;
     private String city;
+    private LocalDate snapshotWeek;
+    private Double avgDaysOnMarket;
+    private Instant computedAt;
     private Double medianPriceKobo;
     private Integer activeListingCount;
-    private Integer newListingsThisWeek;
-    private Integer priceReducedThisWeek;
+    private Integer newListingsCount;
+    private Integer priceReducedCount;
     private Double p25;
     private Double p75;
     private Double p90;
