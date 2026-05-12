@@ -43,8 +43,13 @@ public class ListingSpecifications {
 
             query.distinct(true);
 
+            // Uses health checks as a signal for recency.
+            // Should be okay as long as health checks are consistent.
             Expression<LocalDateTime> first = root.get("firstSeenAt");
-            Expression<LocalDateTime> last = root.get("lastSeenAt");
+            Expression<LocalDateTime> last = cb.coalesce(
+                    root.get("lastHealthCheckAt"),
+                    root.get("firstSeenAt")
+            );
 
 
             // Use postgres-native 'DATE_PART' function to fetch the epoch value
