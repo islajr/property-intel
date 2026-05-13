@@ -46,5 +46,7 @@ INSERT INTO market.neighbourhood_snapshots WITH weekly_reductions AS (
       percentile_cont(0.90) WITHIN GROUP (ORDER BY l.price_kobo) AS p90
 FROM raw_data.scraped_listings l
          LEFT JOIN weekly_reductions r ON l.id = r.listing_id
+WHERE l.city IS NOT NULL
+    AND l.neighbourhood IS NOT NULL
 GROUP BY l.city, l.neighbourhood
 ON CONFLICT (id) DO NOTHING;

@@ -42,6 +42,8 @@ public interface MarketRepository extends JpaRepository<Market, String> {
                      percentile_cont(0.90) WITHIN GROUP (ORDER BY l.price_kobo) AS p90
           FROM raw_data.scraped_listings l
                      LEFT JOIN weekly_reductions r ON l.id = r.listing_id
+          WHERE l.city IS NOT NULL
+              AND l.neighbourhood IS NOT NULL
           GROUP BY l.city, l.neighbourhood
           ON CONFLICT (id) DO UPDATE SET
                 avg_days_on_market = EXCLUDED.avg_days_on_market,
