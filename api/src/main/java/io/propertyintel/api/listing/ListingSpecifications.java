@@ -1,9 +1,12 @@
 package io.propertyintel.api.listing;
 
-import jakarta.persistence.criteria.*;
+import java.time.Instant;
+
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 
 public class ListingSpecifications {
 
@@ -45,8 +48,8 @@ public class ListingSpecifications {
 
             // Uses health checks as a signal for recency.
             // Should be okay as long as health checks are consistent.
-            Expression<LocalDateTime> first = root.get("firstSeenAt");
-            Expression<LocalDateTime> last = cb.coalesce(
+            Expression<Instant> first = root.get("firstSeenAt");
+            Expression<Instant> last = cb.coalesce(
                     root.get("lastHealthCheckAt"),
                     root.get("firstSeenAt")
             );
