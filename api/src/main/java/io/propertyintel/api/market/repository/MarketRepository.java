@@ -1,5 +1,6 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.repository;
 
+import io.propertyintel.api.market.entity.Market;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

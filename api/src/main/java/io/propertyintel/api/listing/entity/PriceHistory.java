@@ -1,4 +1,4 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

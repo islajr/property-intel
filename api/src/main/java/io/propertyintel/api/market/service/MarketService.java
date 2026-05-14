@@ -1,10 +1,12 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.service;
 
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
 import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
+import io.propertyintel.api.market.entity.Market;
 import io.propertyintel.api.market.mapper.MarketMapper;
+import io.propertyintel.api.market.repository.MarketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,5 +1,6 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.service;
 
+import io.propertyintel.api.market.repository.MarketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;

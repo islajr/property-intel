@@ -1,5 +1,6 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.repository;
 
+import io.propertyintel.api.listing.entity.Listing;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

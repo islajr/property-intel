@@ -1,6 +1,6 @@
-package io.propertyintel.api.search;
+package io.propertyintel.api.search.service;
 
-import io.propertyintel.api.listing.ListingService;
+import io.propertyintel.api.listing.service.ListingService;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
 import lombok.RequiredArgsConstructor;

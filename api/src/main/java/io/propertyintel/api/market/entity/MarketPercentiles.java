@@ -1,4 +1,4 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

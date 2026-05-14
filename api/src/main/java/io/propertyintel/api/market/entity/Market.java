@@ -1,4 +1,4 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

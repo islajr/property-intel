@@ -1,7 +1,9 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.util;
 
 import java.time.Instant;
 
+import io.propertyintel.api.listing.entity.Listing;
+import io.propertyintel.api.listing.entity.PriceHistory;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Expression;

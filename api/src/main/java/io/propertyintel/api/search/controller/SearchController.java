@@ -1,7 +1,8 @@
-package io.propertyintel.api.search;
+package io.propertyintel.api.search.controller;
 
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
+import io.propertyintel.api.search.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

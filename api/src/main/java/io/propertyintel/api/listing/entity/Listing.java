@@ -1,4 +1,4 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.entity;
 
 import java.time.Instant;
 import java.util.List;

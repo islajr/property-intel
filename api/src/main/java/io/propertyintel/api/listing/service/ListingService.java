@@ -1,10 +1,12 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.service;
 
 import io.propertyintel.api.global.exception.exceptions.*;
 import io.propertyintel.api.global.util.RepositoryUtils;
+import io.propertyintel.api.listing.repository.ListingRepository;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
+import io.propertyintel.api.listing.entity.Listing;
 import io.propertyintel.api.listing.mapper.ListingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static io.propertyintel.api.listing.ListingSpecifications.*;
+import static io.propertyintel.api.listing.util.ListingSpecifications.*;
 
 
 @Service

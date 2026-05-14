@@ -1,5 +1,6 @@
-package io.propertyintel.api.listing;
+package io.propertyintel.api.listing.controller;
 
+import io.propertyintel.api.listing.service.ListingService;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;

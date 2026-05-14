@@ -1,7 +1,7 @@
 package io.propertyintel.api.market.mapper;
 
-import io.propertyintel.api.market.Market;
-import io.propertyintel.api.market.MarketPercentiles;
+import io.propertyintel.api.market.entity.Market;
+import io.propertyintel.api.market.entity.MarketPercentiles;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
 import io.propertyintel.api.market.dto.NeighbourhoodSummaryData;

@@ -1,5 +1,6 @@
-package io.propertyintel.api.market;
+package io.propertyintel.api.market.controller;
 
+import io.propertyintel.api.market.service.MarketService;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
 import io.swagger.v3.oas.annotations.Operation;

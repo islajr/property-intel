@@ -1,6 +1,6 @@
 package io.propertyintel.api.market.dto;
 
-import io.propertyintel.api.market.MarketPercentiles;
+import io.propertyintel.api.market.entity.MarketPercentiles;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record NeighbourhoodStatsResponse(

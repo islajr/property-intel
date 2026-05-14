@@ -1,7 +1,7 @@
 package io.propertyintel.api.listing.mapper;
 
-import io.propertyintel.api.listing.Listing;
-import io.propertyintel.api.listing.PriceHistory;
+import io.propertyintel.api.listing.entity.Listing;
+import io.propertyintel.api.listing.entity.PriceHistory;
 import io.propertyintel.api.listing.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
