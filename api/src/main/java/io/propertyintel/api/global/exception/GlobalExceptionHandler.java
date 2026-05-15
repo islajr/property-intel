@@ -1,7 +1,9 @@
 package io.propertyintel.api.global.exception;
 
 import io.propertyintel.api.global.exception.exceptions.BadRequestException;
+import io.propertyintel.api.global.exception.exceptions.ForbiddenException;
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
+import io.propertyintel.api.global.exception.exceptions.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,6 +86,24 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
+    }
+
+    // 401 - Unauthorized
+    @ExceptionHandler(value = { UnauthorizedException.class })
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
+    }
+
+    // 403 - Forbidden
+    @ExceptionHandler(value = { ForbiddenException.class })
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(status)
                 .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
