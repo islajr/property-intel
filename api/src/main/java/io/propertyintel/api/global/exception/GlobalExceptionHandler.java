@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +63,15 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
     }
 
+    // 401 - Unauthorized: Bad Credentials
+    @ExceptionHandler(value = { BadCredentialsException.class })
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
+    }
+
     // 400 - Validation Errors
     @ExceptionHandler(value = { MethodArgumentNotValidException.class })
     public ResponseEntity<Map<String, String>> handleValidationErrors(
@@ -95,6 +106,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = { UnauthorizedException.class })
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
+    }
+
+    // 400 - Bad Request
+    @ExceptionHandler(value = { HttpRequestMethodNotSupportedException.class })
+    public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(status)
                 .body(new ErrorResponse(status.name(), ex.getMessage(), request.getRequestURI(), LocalDateTime.now()));
