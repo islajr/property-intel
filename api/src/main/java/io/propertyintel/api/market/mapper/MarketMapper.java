@@ -6,18 +6,20 @@ import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
 import io.propertyintel.api.market.dto.NeighbourhoodSummaryData;
 import io.propertyintel.api.market.dto.NeighbourhoodSummaryMeta;
+import io.propertyintel.api.global.util.CurrencyUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", imports = CurrencyUtils.class)
 public interface MarketMapper {
 
     @Mapping(source = "content", target = "data")
     @Mapping(source = ".", target = "meta")
     NeighbourhoodSummary toPaginatedResponse(Page<Market> markets);
 
-    @Mapping(target = "formattedMedianPrice", expression = "java(String.valueOf(market.getMedianPriceKobo() / 100))")
+    @Mapping(target = "formattedMedianPrice",
+            expression = "java(CurrencyUtils.formatDoubleKoboToNaira(market.getMedianPriceKobo()))")
     NeighbourhoodSummaryData toNeighbourhoodSummary(Market market);
 
     @Mapping(source = "totalElements", target = "count")
@@ -27,7 +29,8 @@ public interface MarketMapper {
     @Mapping(source = "last", target = "isLast")
     NeighbourhoodSummaryMeta toNeighbourhoodSummaryMeta(Page<?> page);
 
-    @Mapping(target = "formattedMedianPrice", expression = "java(String.valueOf(market.getMedianPriceKobo() / 100))")
+    @Mapping(target = "formattedMedianPrice",
+            expression = "java(CurrencyUtils.formatDoubleKoboToNaira(market.getMedianPriceKobo()))")
     @Mapping(target = "pricePercentiles.p25", source = "p25")
     @Mapping(target = "pricePercentiles.p50", source = "medianPriceKobo")
     @Mapping(target = "pricePercentiles.p75", source = "p75")
