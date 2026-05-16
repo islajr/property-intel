@@ -1,5 +1,13 @@
 package io.propertyintel.api.global.exception.exceptions;
 
 public class BadRequestException extends RuntimeException {
-    public BadRequestException(String message) {}
+
+    // Default constructor
+    public BadRequestException() {
+        super("Bad Request");
+    }
+
+    public BadRequestException(String message) {
+        super(message);
+    }
 }

@@ -1,5 +1,13 @@
 package io.propertyintel.api.global.exception.exceptions;
 
 public class UnauthorizedException extends RuntimeException {
-    public UnauthorizedException(String message) {}
+
+    // Default constructor
+    public UnauthorizedException() {
+        super("Unauthorized");
+    }
+
+    public UnauthorizedException(String message) {
+        super(message);
+    }
 }

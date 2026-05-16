@@ -1,5 +1,13 @@
 package io.propertyintel.api.global.exception.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {}
+
+    // Default constructor
+    public ResourceNotFoundException() {
+        super("Resource not found");
+    }
+
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
 }

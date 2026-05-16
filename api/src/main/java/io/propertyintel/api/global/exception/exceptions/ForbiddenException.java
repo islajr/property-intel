@@ -1,5 +1,13 @@
 package io.propertyintel.api.global.exception.exceptions;
 
 public class ForbiddenException extends RuntimeException {
-    public ForbiddenException(String message) {}
+
+    // Default constructor
+    public ForbiddenException() {
+        super("Forbidden");
+    }
+
+    public ForbiddenException(String message) {
+        super(message);
+    }
 }
