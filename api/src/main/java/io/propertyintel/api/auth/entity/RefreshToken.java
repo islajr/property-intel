@@ -16,6 +16,14 @@ import java.util.UUID;
 @NoArgsConstructor
 public class RefreshToken {
 
+    public RefreshToken(String tokenHash, User user, Boolean isRevoked, Instant createdAt, Instant expiresAt) {
+        this.tokenHash = tokenHash;
+        this.user = user;
+        this.isRevoked = isRevoked;
+        this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

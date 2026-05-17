@@ -8,6 +8,7 @@ import io.propertyintel.api.auth.entity.User;
 import io.propertyintel.api.auth.entity.UserPrincipal;
 import io.propertyintel.api.auth.repository.UserRepository;
 import io.propertyintel.api.global.exception.exceptions.BadRequestException;
+import io.propertyintel.api.global.exception.exceptions.UnauthorizedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,7 @@ public class AuthService {
 
         log.info("Generated access token for user: {}", user.getEmail());
 
-        String refreshToken = refreshTokenService.generateRefreshToken(user.getUser());
+        String refreshToken = refreshTokenService.generateRefreshToken(user.getUser(), false);
         log.info("Generated refresh token for user: {}", user.getEmail());
 
         // Store refresh tokens in http-only cookie
@@ -97,16 +98,16 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
-        log.info("Created new user {}", user.getEmail());
+        log.debug("Created new user {}", user.getEmail());
 
         // TODO: Verify user email (background job)
         // emailVerificationService.sendVerificationEmail(user);
 
         String accessToken = jwtService.generateToken(user);
-        log.info("Generated access token for new user: {}", user.getEmail());
+        log.debug("Generated access token for new user: {}", user.getEmail());
 
-        String refreshToken = refreshTokenService.generateRefreshToken(user);
-        log.info("Generated refresh token for new user: {}", user.getEmail());
+        String refreshToken = refreshTokenService.generateRefreshToken(user, true);
+        log.debug("Generated refresh token for new user: {}", user.getEmail());
 
         // Store refresh tokens in http-only cookie
         ResponseCookie cookie = createCookieToken(refreshToken);
@@ -119,11 +120,17 @@ public class AuthService {
                 .body(new AuthResponse(accessToken, accessTokenExpirySeconds));
     }
 
+    @Transactional
     public ResponseEntity<AuthResponse> refresh(String refreshToken) {
 
         /*
         * Refreshes access token with the refresh token as long as the latter remains valid.
+        * Refreshes refresh token also every 15 minutes
         * */
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new UnauthorizedException("Refresh token not found.");
+        }
 
         RefreshToken storedToken = refreshTokenService.validateToken(refreshToken);
 
@@ -132,10 +139,34 @@ public class AuthService {
 
         log.info("Refresh token attempt from user: {}", userPrincipal.getEmail());
         String accessToken = jwtService.generateToken(userPrincipal.getUser());
-        log.info("Refreshed access token for user: {}", userPrincipal.getEmail());
+        log.debug("Refreshed access token for user: {}", userPrincipal.getEmail());
 
-        return new ResponseEntity<>(new AuthResponse(accessToken, accessTokenExpirySeconds), HttpStatus.OK);
+        String newRefreshToken = refreshTokenService.generateRefreshToken(userPrincipal.getUser(), false);
+        log.debug("Generated refresh token for logged-in user: {}", userPrincipal.getEmail());
 
+        // Store refresh tokens in http-only cookie
+        ResponseCookie refreshCookie = updateCookie(newRefreshToken);
+        log.debug("Refreshed refresh cookie for user: {}", userPrincipal.getEmail());
+
+        log.info("Successfully refreshed access and refresh tokens for user: {}", userPrincipal.getEmail());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(new AuthResponse(accessToken, accessTokenExpirySeconds));
+
+    }
+
+    ResponseCookie updateCookie(String token) {
+
+        return ResponseCookie.from(
+                        "refreshToken", token
+                )
+                .httpOnly(true)
+                .secure(true)
+                .path("/api/v1/auth")
+                .maxAge(refreshTokenExpirySeconds)
+                .sameSite("Strict") // maybe 'lax' to deal with hosting variance
+                .build();
     }
 
     ResponseCookie createCookieToken(String token) {

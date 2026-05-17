@@ -28,7 +28,12 @@ public class RefreshTokenService {
     private Long expiry;
 
     @Transactional
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(User user, Boolean isNewUser) {
+
+        /*
+        * Generates a new refresh token, hashes it and persists it to db.
+        * */
+
         byte[] randomBytes = new byte[64];
         secureRandom.nextBytes(randomBytes);
 
@@ -38,13 +43,25 @@ public class RefreshTokenService {
 
         String hashedToken = hashToken(rawToken);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .tokenHash(hashedToken)
-                .user(user)
-                .expiresAt(Instant.now().plusSeconds(expiry))
-                .isRevoked(false)
-                .build();
-        refreshTokenRepository.save(refreshToken);
+        if (!isNewUser) {
+            RefreshToken updateRecord = RefreshToken.builder()
+                    .tokenHash(hashedToken)
+                    .user(user)
+                    .isRevoked(false)
+                    .createdAt(Instant.now())
+                    .expiresAt(Instant.now().plusSeconds(expiry))
+                    .build();
+            refreshTokenRepository.updateToken(updateRecord);
+        } else {
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .tokenHash(hashedToken)
+                    .user(user)
+                    .expiresAt(Instant.now().plusSeconds(expiry))
+                    .isRevoked(false)
+                    .build();
+            refreshTokenRepository.save(refreshToken);
+
+        }
 
         return rawToken;
     }

@@ -42,7 +42,7 @@ public class JwtLogoutHandler implements LogoutHandler {
                     )
                     .httpOnly(true)
                     .secure(true)
-                    .path("/api/v1/auth/refresh")
+                    .path("/api/v1/auth")
                     .maxAge(0)
                     .build();
 
@@ -66,7 +66,7 @@ public class JwtLogoutHandler implements LogoutHandler {
     }
 
     private String extractRefreshToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
+        if (request.getCookies() == null)
 
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("refreshToken")) return cookie.getValue();
