@@ -1,12 +1,13 @@
 package io.propertyintel.api.auth.util;
 
+import io.propertyintel.api.auth.config.JwtProperties;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
@@ -24,17 +25,15 @@ public class RSAKeyProperties {
     private final RSAPublicKey publicKey;
     private final RSAPrivateKey privateKey;
 
-    public RSAKeyProperties() {
-        this.publicKey = loadPublicKey();
-        this.privateKey = loadPrivateKey();
+    public RSAKeyProperties(JwtProperties properties) {
+        this.publicKey = loadPublicKey(properties.publicKeyPath());
+        this.privateKey = loadPrivateKey(properties.privateKeyPath());
     }
 
-    private RSAPublicKey loadPublicKey() {
+    private RSAPublicKey loadPublicKey(String path) {
         try {
             String key = Files.readString(
-                    new ClassPathResource("keys/public.pem")    // TODO: should extract into secrets
-                            .getFile()
-                            .toPath()
+                    Path.of(path)
             );
 
             key = key
@@ -49,23 +48,21 @@ public class RSAKeyProperties {
 
             KeyFactory factory = KeyFactory.getInstance("RSA");
 
-            log.debug("Successfully loaded public key: {}", key);
+            log.debug("Successfully loaded public key");
             return (RSAPublicKey) factory.generatePublic(spec);
 
 
 
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
             log.debug("Failed to load public key", e);
-            throw new RuntimeException("Failed to authenticate user", e);
+            throw new RuntimeException("Internal Server Error", e);
         }
     }
 
-    private RSAPrivateKey loadPrivateKey() {
+    private RSAPrivateKey loadPrivateKey(String path) {
         try {
             String key = Files.readString(
-                    new ClassPathResource("keys/private.pem")   // TODO: should extract into secrets
-                            .getFile()
-                            .toPath()
+                    Path.of(path)
             );
 
             key = key
@@ -84,9 +81,9 @@ public class RSAKeyProperties {
             return (RSAPrivateKey) factory.generatePrivate(spec);
 
 
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e) {
             log.debug("Failed to load private key", e);
-            throw new RuntimeException("Failed to authenticate user", e);
+            throw new RuntimeException("Internal Server Error", e);
         }
     }
 }
