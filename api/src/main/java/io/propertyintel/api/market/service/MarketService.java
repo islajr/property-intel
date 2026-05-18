@@ -1,6 +1,7 @@
 package io.propertyintel.api.market.service;
 
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
+import io.propertyintel.api.global.util.CacheNames;
 import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
@@ -8,6 +9,7 @@ import io.propertyintel.api.market.entity.Market;
 import io.propertyintel.api.market.mapper.MarketMapper;
 import io.propertyintel.api.market.repository.MarketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ public class MarketService {
         return marketMapper.toPaginatedResponse(markets);
     }
 
+    @Cacheable(value = CacheNames.MARKET_DETAILS, key = "#neighbourhood")
     public NeighbourhoodStatsResponse getNeighbourhoodStats(String neighbourhood) {
         Market market = marketRepository.findByNeighbourhood(neighbourhood).orElseThrow(
                 () -> new ResourceNotFoundException("Neighbourhood not found"));

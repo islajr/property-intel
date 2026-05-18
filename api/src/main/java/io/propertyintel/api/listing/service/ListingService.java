@@ -2,6 +2,7 @@ package io.propertyintel.api.listing.service;
 
 import io.propertyintel.api.global.exception.exceptions.BadRequestException;
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
+import io.propertyintel.api.global.util.CacheNames;
 import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
@@ -10,6 +11,7 @@ import io.propertyintel.api.listing.entity.Listing;
 import io.propertyintel.api.listing.mapper.ListingMapper;
 import io.propertyintel.api.listing.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +28,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final RepositoryUtils repositoryUtils;
 
+    @Cacheable(value = CacheNames.LISTING_DETAILS, key = "#id")
     public ListingDetailResponse getListing(Long id) {
 
         /* Return details of the requested listing and an error if not found */
