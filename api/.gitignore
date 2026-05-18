@@ -34,3 +34,8 @@ build/
 
 ### Security Keys ###
 *.pem
+
+### Development Files ###
+docker-compose-dev.yml
+docker-entrypoint-dev.sh
+Dockerfile.dev
