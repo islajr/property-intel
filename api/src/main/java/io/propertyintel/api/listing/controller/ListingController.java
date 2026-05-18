@@ -1,9 +1,9 @@
 package io.propertyintel.api.listing.controller;
 
-import io.propertyintel.api.listing.service.ListingService;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
+import io.propertyintel.api.listing.service.ListingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +30,7 @@ public class ListingController {
     })
     @GetMapping("/api/v1/listings")
     public ResponseEntity<ListingResponse> getListings(@Valid ListingSearchParams searchParams) {
-        return listingService.getListings(searchParams);
+        return ResponseEntity.ok(listingService.getListings(searchParams));
     }
 
     @Operation(summary = "Find information on a specific listings",
@@ -42,6 +42,6 @@ public class ListingController {
     public ResponseEntity<ListingDetailResponse> getListing(
             @Parameter(description = "Listing id", example = "23", required = true)
                                                                 @PathVariable Long id) {
-        return listingService.getListing(id);
+        return ResponseEntity.ok(listingService.getListing(id));
     }
 }

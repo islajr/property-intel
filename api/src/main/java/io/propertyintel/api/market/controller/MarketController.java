@@ -43,7 +43,7 @@ public class MarketController {
             @Min(value = 0, message = "Page number cannot be negative")
             @RequestParam(required = false) Integer page
             ) {
-        return marketService.getNeighbourhoods(sort_by, limit, page);
+        return ResponseEntity.ok(marketService.getNeighbourhoods(sort_by, limit, page));
     }
 
     @Operation(summary = "Find information on specific neighbourhood markets",
@@ -55,7 +55,7 @@ public class MarketController {
     public ResponseEntity<NeighbourhoodStatsResponse> getNeighbourhoodStats(
             @Parameter(description = "Neighbourhood", example = "Ajah", required = true)
                 @PathVariable String neighbourhood) {
-        return marketService.getNeighbourhoodStats(neighbourhood);
+        return ResponseEntity.ok(marketService.getNeighbourhoodStats(neighbourhood));
     }
 
 

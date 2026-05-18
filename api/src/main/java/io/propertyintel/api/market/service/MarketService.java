@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +21,7 @@ public class MarketService {
     private final RepositoryUtils repositoryUtils;
     private final MarketMapper marketMapper;
 
-    public ResponseEntity<NeighbourhoodSummary> getNeighbourhoods(String sortBy, Integer limit, Integer page) {
+    public NeighbourhoodSummary getNeighbourhoods(String sortBy, Integer limit, Integer page) {
         Sort sort = resolveSort(sortBy);
         Pageable pageable = repositoryUtils.buildPageable(limit, sort, page == null ? 0 : page);
 
@@ -30,14 +29,14 @@ public class MarketService {
 
         if (markets.isEmpty()) throw new ResourceNotFoundException("No market neighbourhoods found");
 
-        return(ResponseEntity.ok(marketMapper.toPaginatedResponse(markets)));
+        return marketMapper.toPaginatedResponse(markets);
     }
 
-    public ResponseEntity<NeighbourhoodStatsResponse> getNeighbourhoodStats(String neighbourhood) {
+    public NeighbourhoodStatsResponse getNeighbourhoodStats(String neighbourhood) {
         Market market = marketRepository.findByNeighbourhood(neighbourhood).orElseThrow(
                 () -> new ResourceNotFoundException("Neighbourhood not found"));
 
-        return (ResponseEntity.ok(marketMapper.toStatsResponse(market)));
+        return (marketMapper.toStatsResponse(market));
 
 
     }

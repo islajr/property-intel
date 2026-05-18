@@ -25,6 +25,6 @@ public class SearchController {
     })
     @GetMapping("/api/v1/search")
     public ResponseEntity<ListingResponse> basicSearch(@Valid ListingSearchParams params) {
-        return searchService.performSearch(params);
+        return ResponseEntity.ok(searchService.performSearch(params));
     }
 }

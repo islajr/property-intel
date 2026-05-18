@@ -1,19 +1,19 @@
 package io.propertyintel.api.listing.service;
 
-import io.propertyintel.api.global.exception.exceptions.*;
+import io.propertyintel.api.global.exception.exceptions.BadRequestException;
+import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
 import io.propertyintel.api.global.util.RepositoryUtils;
-import io.propertyintel.api.listing.repository.ListingRepository;
 import io.propertyintel.api.listing.dto.ListingDetailResponse;
 import io.propertyintel.api.listing.dto.ListingResponse;
 import io.propertyintel.api.listing.dto.ListingSearchParams;
 import io.propertyintel.api.listing.entity.Listing;
 import io.propertyintel.api.listing.mapper.ListingMapper;
+import io.propertyintel.api.listing.repository.ListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import static io.propertyintel.api.listing.util.ListingSpecifications.*;
@@ -26,7 +26,7 @@ public class ListingService {
     private final ListingMapper listingMapper;
     private final RepositoryUtils repositoryUtils;
 
-    public ResponseEntity<ListingDetailResponse> getListing(Long id) {
+    public ListingDetailResponse getListing(Long id) {
 
         /* Return details of the requested listing and an error if not found */
 
@@ -34,10 +34,10 @@ public class ListingService {
                 () -> new ResourceNotFoundException("Listing with id %d not found".formatted(id)));
 
         System.out.println(listing.getPriceHistory().getFirst().getEventDate());
-        return ResponseEntity.ok(listingMapper.toDetailResponse(listing));
+        return listingMapper.toDetailResponse(listing);
     }
 
-    public ResponseEntity<ListingResponse> getListings(ListingSearchParams searchParams) {
+    public ListingResponse getListings(ListingSearchParams searchParams) {
 
         Specification<Listing> spec = Specification
                 .where(hasNeighbourhood(searchParams.getNeighbourhood()))
@@ -58,7 +58,7 @@ public class ListingService {
 
         if (listingPage.isEmpty()) throw new ResourceNotFoundException("No listings found");
 
-        return ResponseEntity.ok(listingMapper.toResponse(listingPage));
+        return listingMapper.toResponse(listingPage);
 
 
     }
