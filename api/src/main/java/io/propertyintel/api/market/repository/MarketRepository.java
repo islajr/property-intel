@@ -46,16 +46,7 @@ public interface MarketRepository extends JpaRepository<Market, String> {
           WHERE l.city IS NOT NULL
               AND l.neighbourhood IS NOT NULL
           GROUP BY l.city, l.neighbourhood
-          ON CONFLICT (id) DO UPDATE SET
-                avg_days_on_market = EXCLUDED.avg_days_on_market,
-                computed_at = EXCLUDED.computed_at,
-                active_listing_count = EXCLUDED.active_listing_count,
-                new_listings_count = EXCLUDED.new_listings_count,
-                price_reduced_this_week = EXCLUDED.price_reduced_count,
-                median_price_kobo = EXCLUDED.median_price_kobo,
-                p25 = EXCLUDED.p25,
-                p75 = EXCLUDED.p75,
-                p90 = EXCLUDED.p90
+          ON CONFLICT (id) DO NOTHING
     """, nativeQuery = true)
     void refreshMarketSnapshot();
 }
