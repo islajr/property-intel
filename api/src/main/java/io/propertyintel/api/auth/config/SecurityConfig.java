@@ -1,6 +1,7 @@
 package io.propertyintel.api.auth.config;
 
 import io.propertyintel.api.auth.service.UserDetailService;
+import io.propertyintel.api.global.config.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ import java.util.Objects;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final UserDetailService userDetailService;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
@@ -58,6 +60,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .addFilterBefore(
                         jwtFilter, UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        rateLimitFilter, JwtFilter.class
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")

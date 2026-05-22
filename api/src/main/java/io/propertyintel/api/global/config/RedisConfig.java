@@ -1,7 +1,13 @@
 package io.propertyintel.api.global.config;
 
+import io.github.bucket4j.distributed.ExpirationAfterWriteStrategy;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
 import io.propertyintel.api.global.util.CacheNames;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -15,10 +21,34 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.lettuce.core.codec.ByteArrayCodec;
+import io.lettuce.core.codec.RedisCodec;
+import io.lettuce.core.codec.StringCodec;
+
 @Configuration
 @Slf4j
 public class RedisConfig {
 
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
+
+    @Bean
+    public ProxyManager<String> proxyManager() {
+        RedisClient redisClient = RedisClient.create(
+                String.format("redis://%s:%d", redisHost, redisPort)
+        );
+
+        StatefulRedisConnection<String, byte[]> connection = redisClient.connect(
+                RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE)
+        );
+
+        return LettuceBasedProxyManager.builderFor(connection)
+                .withExpirationStrategy(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofHours(1)))
+                .build();
+    }
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
