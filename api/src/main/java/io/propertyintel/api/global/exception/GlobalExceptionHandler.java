@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
                 status.name(),
                 message,
                 request.getRequestURI(),
-                LocalDateTime.now()
+                Instant.now()
         );
         return ResponseEntity.status(status).body(errorResponse);
     }

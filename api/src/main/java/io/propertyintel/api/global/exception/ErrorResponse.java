@@ -1,6 +1,6 @@
 package io.propertyintel.api.global.exception;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record ErrorResponse(
 
@@ -9,7 +9,7 @@ public record ErrorResponse(
         String path,
         String timestamp
 ) {
-    public ErrorResponse(String error, String message, String path, LocalDateTime timestamp) {
+    public ErrorResponse(String error, String message, String path, Instant timestamp) {
         this(error, message, path, timestamp.toString());
     }
 }
