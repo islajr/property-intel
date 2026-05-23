@@ -1,7 +1,9 @@
 package io.propertyintel.api.global.config;
 
 import java.io.IOException;
+import java.time.Instant;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -43,14 +45,26 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         ConsumptionProbe probe = rateLimitService.tryConsume(key, tier);
 
-        // Add headers to every response
+        // Add headers to every response regardless of outcome
         response.setHeader("X-RateLimit-Limit", String.valueOf(rateLimitService.getCapacityForTier(tier)));
         response.setHeader("X-RateLimit-Remaining", String.valueOf(probe.getRemainingTokens()));
         response.setHeader("X-RateLimit-Reset", String.valueOf(probe.getNanosToWaitForRefill() / 1_000_000_000L));
 
         if (!probe.isConsumed()) {
             response.setStatus(429);
-            response.getWriter().write("Too Many Requests");
+            response.getWriter().write("""
+                    {
+                        "error": "%s",
+                        "message": "%s",
+                        "path": "%s",
+                        "timestamp": "%s"
+                    }
+                    """.formatted(
+                    HttpStatus.TOO_MANY_REQUESTS.name(),
+                    "Rate limit exceeded. Please try again later",
+                    request.getRequestURI(),
+                    Instant.now()
+            ));
             return;
         }
 
