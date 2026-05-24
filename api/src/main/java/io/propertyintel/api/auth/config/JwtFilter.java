@@ -7,7 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,20 +15,23 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final HandlerExceptionResolver resolver;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludedPaths = Arrays.asList(
-            "/api/v1/auth/**",
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/refresh",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/v3/api-docs",
@@ -39,44 +42,46 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/search"
     );
 
+    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.resolver = resolver;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        /*
-        * JwtFilter is invoked by the SecurityFilterChain. It:
-        *   - reads the authorization header
-        *   - extracts token
-        *   - validates token
-        *   - authenticates user
-        * */
+        try {
+            final String authHeader = request.getHeader("Authorization");
+            final String authPrefix = "Bearer ";
 
-
-        final String authHeader = request.getHeader("Authorization");
-        final String authPrefix = "Bearer ";
-
-        if (authHeader == null || !authHeader.startsWith(authPrefix)) {
-            throw new BadRequestException("Authorization header is incorrect");
-        }
-
-        String token = authHeader.substring(authPrefix.length());
-        String email = jwtService.extractEmail(token);
-
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // if credentials are valid and user is unauthenticated
-            UserPrincipal user = (UserPrincipal) userDetailsService.loadUserByUsername(email);
-
-            if (jwtService.isTokenValid(token, user)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            // Check for auth header
+            if (authHeader == null || !authHeader.startsWith(authPrefix)) {
+                throw new BadRequestException("Authorization header is incorrect");
             }
+
+            String token = authHeader.substring(authPrefix.length());
+            String email = jwtService.extractEmail(token);
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // if credentials are valid and user is unauthenticated
+                UserPrincipal user = (UserPrincipal) userDetailsService.loadUserByUsername(email);
+
+                if (jwtService.isTokenValid(token, user)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource()
+                            .buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (Exception ex) {
+            resolver.resolveException(request, response, null, ex);
+            return;
         }
 
         filterChain.doFilter(request, response);
-
     }
 
     @Override

@@ -16,6 +16,8 @@ import java.io.IOException;
 public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, @Nullable Authentication authentication) throws IOException, ServletException {
+        if (response.isCommitted() || response.getStatus() >= 400) return;
+
         log.info("Successfully logged out");
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
