@@ -31,17 +31,12 @@ import io.lettuce.core.codec.StringCodec;
 @Slf4j
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
+    @Value("${spring.data.redis.url}")
+    private String redisURL;
 
     @Bean
     public ProxyManager<String> proxyManager() {
-        RedisClient redisClient = RedisClient.create(
-                String.format("redis://%s:%d", redisHost, redisPort)
-        );
+        RedisClient redisClient = RedisClient.create(redisURL);
 
         StatefulRedisConnection<String, byte[]> connection = redisClient.connect(
                 RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE)
