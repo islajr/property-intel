@@ -29,6 +29,8 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final RateLimitFilter rateLimitFilter;
     private final UserDetailService userDetailService;
+    private final CustomAuthEntryPoint customAuthEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     private final JwtLogoutHandler jwtLogoutHandler;
     private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
 
@@ -58,6 +60,10 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .addFilterBefore(
                         jwtFilter, UsernamePasswordAuthenticationFilter.class
                 )

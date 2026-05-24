@@ -1,6 +1,8 @@
 package io.propertyintel.api.global.exception.exceptions;
 
-public class UnauthorizedException extends RuntimeException {
+import org.springframework.security.core.AuthenticationException;
+
+public class UnauthorizedException extends AuthenticationException {
 
     // Default constructor
     public UnauthorizedException() {
