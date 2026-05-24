@@ -65,6 +65,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                     request.getRequestURI(),
                     Instant.now()
             ));
+            response.getWriter().flush();
             return;
         }
 
