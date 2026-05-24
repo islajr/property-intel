@@ -1,4 +1,4 @@
-package io.propertyintel.api.global.config;
+package io.propertyintel.api.global.ratelimit.config;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.github.bucket4j.ConsumptionProbe;
-import io.propertyintel.api.global.service.RateLimitService;
-import io.propertyintel.api.global.service.RateLimitService.Tier;
+import io.propertyintel.api.global.ratelimit.service.RateLimitService;
+import io.propertyintel.api.global.ratelimit.service.RateLimitService.Tier;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,7 @@
 package io.propertyintel.api.market.service;
 
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
-import io.propertyintel.api.global.util.CacheNames;
+import io.propertyintel.api.global.caching.CacheNames;
 import io.propertyintel.api.global.util.RepositoryUtils;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;

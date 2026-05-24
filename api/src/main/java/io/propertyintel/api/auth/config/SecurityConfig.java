@@ -1,7 +1,7 @@
 package io.propertyintel.api.auth.config;
 
 import io.propertyintel.api.auth.service.UserDetailService;
-import io.propertyintel.api.global.config.RateLimitFilter;
+import io.propertyintel.api.global.ratelimit.config.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

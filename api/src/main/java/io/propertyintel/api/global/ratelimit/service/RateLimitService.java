@@ -1,4 +1,4 @@
-package io.propertyintel.api.global.service;
+package io.propertyintel.api.global.ratelimit.service;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.BucketConfiguration;

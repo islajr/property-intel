@@ -1,4 +1,4 @@
-package io.propertyintel.api.global.util;
+package io.propertyintel.api.global.caching;
 
 public final class CacheNames {
 
