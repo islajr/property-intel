@@ -42,9 +42,8 @@ public class ListingSearchParams {
     @Schema(description = "Sorting technique", example = "newest")
     String sort = "newest";
 
-    @Schema(description = "Page number", example = "0")
-    @Min(value = 0, message = "Page number cannot be negative")
-    Integer page = 0;
+    @Schema(description = "Pagination cursor", example = "eyJpZCB6NYzM30=")
+    String cursor;
 
     @Schema(description = "Maximum number of information per page", example = "20")
     @Min(value = 1, message = "Cannot request fewer than 1 item per page")

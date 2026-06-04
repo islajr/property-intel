@@ -1,11 +1,10 @@
 package io.propertyintel.api.listing.util;
 
 import java.time.Instant;
+import org.springframework.data.jpa.domain.Specification;
 
 import io.propertyintel.api.listing.entity.Listing;
 import io.propertyintel.api.listing.entity.PriceHistory;
-import org.springframework.data.jpa.domain.Specification;
-
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -103,6 +102,45 @@ public class ListingSpecifications {
             } else {
                 return cb.equal(root.get("listingStatus"), "ACTIVE");
             }
+        };
+    }
+
+    public static Specification<Listing> afterCursor(Listing lastListing, String sort) {
+        return (root, query, cb) -> {
+            if (lastListing == null) return null;
+
+            String sortOption = sort == null ? "newest" : sort;
+            return switch (sortOption) {
+                case "price_asc" -> cb.or(
+                        cb.greaterThan(root.get("priceKobo"), lastListing.getPriceKobo()),
+                        cb.and(
+                                cb.equal(root.get("priceKobo"), lastListing.getPriceKobo()),
+                                cb.greaterThan(root.get("id"), lastListing.getId())
+                        )
+                );
+                case "price_desc" -> cb.or(
+                        cb.lessThan(root.get("priceKobo"), lastListing.getPriceKobo()),
+                        cb.and(
+                                cb.equal(root.get("priceKobo"), lastListing.getPriceKobo()),
+                                cb.lessThan(root.get("id"), lastListing.getId())
+                        )
+                );
+                case "days_asc" -> cb.or(
+                        cb.greaterThan(root.get("firstSeenAt"), lastListing.getFirstSeenAt()),
+                        cb.and(
+                                cb.equal(root.get("firstSeenAt"), lastListing.getFirstSeenAt()),
+                                cb.greaterThan(root.get("id"), lastListing.getId())
+                        )
+                );
+                case "newest" -> cb.or(
+                        cb.lessThan(root.get("firstSeenAt"), lastListing.getFirstSeenAt()),
+                        cb.and(
+                                cb.equal(root.get("firstSeenAt"), lastListing.getFirstSeenAt()),
+                                cb.lessThan(root.get("id"), lastListing.getId())
+                        )
+                );
+                default -> null;
+            };
         };
     }
 }
