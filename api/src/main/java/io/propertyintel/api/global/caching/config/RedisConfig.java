@@ -66,6 +66,7 @@ public class RedisConfig {
         log.info("Adding specialized cache configurations");
         cacheConfigurationMap.put(CacheNames.MARKET_DETAILS, cacheConfig.entryTtl(Duration.ofHours(6)));
         cacheConfigurationMap.put(CacheNames.LISTING_DETAILS, cacheConfig.entryTtl(Duration.ofHours(6)));
+        cacheConfigurationMap.put(CacheNames.MARKET_NEIGHBOURHOODS, cacheConfig.entryTtl(Duration.ofHours(6)));
 
         log.info("Successfully configured Redis cache manager");
 

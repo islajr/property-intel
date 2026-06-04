@@ -30,6 +30,10 @@ public class MarketService {
     private final MarketRepository marketRepository;
     private final MarketMapper marketMapper;
 
+    @Cacheable(
+            value = CacheNames.MARKET_NEIGHBOURHOODS,
+            key = "(#sortBy != null ? #sortBy : 'neighbourhood') + '_' + (#limit != null ? #limit : 20) + '_' + (#cursor != null ? #cursor : '')"
+    )
     public NeighbourhoodSummary getNeighbourhoods(String sortBy, Integer limit, String cursor) {
         Sort sort = resolveSort(sortBy);
 
