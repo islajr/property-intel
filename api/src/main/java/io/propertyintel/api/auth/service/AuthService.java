@@ -1,6 +1,6 @@
 package io.propertyintel.api.auth.service;
 
-import io.propertyintel.api.auth.dto.AuthResponse;
+import io.propertyintel.api.auth.dto.AuthResult;
 import io.propertyintel.api.auth.dto.LoginRequest;
 import io.propertyintel.api.auth.dto.RegisterRequest;
 import io.propertyintel.api.auth.entity.RefreshToken;
@@ -13,10 +13,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,15 +32,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-
-    @Value("${refreshtoken.expiry.seconds}")
-    private Long refreshTokenExpirySeconds;
-
     @Value("${accesstoken.expiry.seconds}")
     private Integer accessTokenExpirySeconds;
 
     @Transactional
-    public ResponseEntity<AuthResponse> login(LoginRequest loginRequest) {
+    public AuthResult login(LoginRequest loginRequest) {
         log.info("Login request from user: {}", loginRequest.email());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -55,8 +47,7 @@ public class AuthService {
 
         if (!authentication.isAuthenticated() || authentication.getPrincipal() == null) {
             log.warn("Authentication failed for user: {}", loginRequest.email());
-            // throw some exception and log failure
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("Authentication failed for user: " + loginRequest.email());
         }
 
         UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
@@ -68,20 +59,13 @@ public class AuthService {
         String refreshToken = refreshTokenService.generateRefreshToken(user.getUser(), false);
         log.info("Generated refresh token for user: {}", user.getEmail());
 
-        // Store refresh tokens in http-only cookie
-        ResponseCookie cookie = createCookieToken(refreshToken);
-        log.debug("Generated refresh cookie for user: {}", user.getEmail());
-
         log.info("Successfully logged in user: {}", user.getEmail());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new AuthResponse(accessToken,  accessTokenExpirySeconds));
-
+        return new AuthResult(accessToken, refreshToken, accessTokenExpirySeconds);
     }
 
     @Transactional
-    public ResponseEntity<AuthResponse> register(RegisterRequest registerRequest) {
+    public AuthResult register(RegisterRequest registerRequest) {
 
         log.info("Registration request from user: {}", registerRequest.email());
 
@@ -109,19 +93,13 @@ public class AuthService {
         String refreshToken = refreshTokenService.generateRefreshToken(user, true);
         log.debug("Generated refresh token for new user: {}", user.getEmail());
 
-        // Store refresh tokens in http-only cookie
-        ResponseCookie cookie = createCookieToken(refreshToken);
-        log.debug("Generated refresh cookie for new user: {}", user.getEmail());
-
         log.info("Successfully registered user: {}", user.getEmail());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new AuthResponse(accessToken, accessTokenExpirySeconds));
+        return new AuthResult(accessToken, refreshToken, accessTokenExpirySeconds);
     }
 
     @Transactional
-    public ResponseEntity<AuthResponse> refresh(String refreshToken) {
+    public AuthResult refresh(String refreshToken) {
 
         /*
         * Refreshes access token with the refresh token as long as the latter remains valid.
@@ -144,40 +122,8 @@ public class AuthService {
         String newRefreshToken = refreshTokenService.generateRefreshToken(userPrincipal.getUser(), false);
         log.debug("Generated refresh token for logged-in user: {}", userPrincipal.getEmail());
 
-        // Store refresh tokens in http-only cookie
-        ResponseCookie refreshCookie = updateCookie(newRefreshToken);
-        log.debug("Refreshed refresh cookie for user: {}", userPrincipal.getEmail());
-
         log.info("Successfully refreshed access and refresh tokens for user: {}", userPrincipal.getEmail());
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(new AuthResponse(accessToken, accessTokenExpirySeconds));
-
-    }
-
-    ResponseCookie updateCookie(String token) {
-
-        return ResponseCookie.from(
-                        "refreshToken", token
-                )
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/v1/auth")
-                .maxAge(refreshTokenExpirySeconds)
-                .sameSite("Strict") // maybe 'lax' to deal with hosting variance
-                .build();
-    }
-
-    ResponseCookie createCookieToken(String token) {
-        return ResponseCookie.from(
-                        "refreshToken", token
-                )
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/v1/auth")
-                .maxAge(refreshTokenExpirySeconds)
-                .sameSite("Strict") // "Lax" maybe?
-                .build();
+        return new AuthResult(accessToken, newRefreshToken, accessTokenExpirySeconds);
     }
 }
