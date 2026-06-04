@@ -33,27 +33,38 @@ import static io.propertyintel.api.listing.util.ListingSpecifications.maxPrice;
 import static io.propertyintel.api.listing.util.ListingSpecifications.minBeds;
 import static io.propertyintel.api.listing.util.ListingSpecifications.minPrice;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListingService {
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
 
     @Cacheable(value = CacheNames.LISTING_DETAILS, key = "#id")
     public ListingDetailResponse getListing(Long id) {
+        log.info("Fetching detailed information for listing ID: {}", id);
 
-        /* Return details of the requested listing and an error if not found */
+        Listing listing = listingRepository.findListingById(id).orElseThrow(() -> {
+            log.warn("Listing with ID {} not found", id);
+            return new ResourceNotFoundException("Listing with id %d not found".formatted(id));
+        });
 
-        Listing listing = listingRepository.findListingById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Listing with id %d not found".formatted(id)));
+        if (listing.getPriceHistory() != null && !listing.getPriceHistory().isEmpty()) {
+            log.debug("Listing details retrieved. First seen date: {}", listing.getPriceHistory().getFirst().getEventDate());
+        } else {
+            log.debug("Listing details retrieved. No price history records found.");
+        }
 
-        System.out.println(listing.getPriceHistory().getFirst().getEventDate());
         return listingMapper.toDetailResponse(listing);
     }
 
     public ListingResponse getListings(ListingSearchParams searchParams) {
+        log.info("Searching listings with parameters: neighbourhood={}, type={}, minBeds={}, maxBeds={}, minPrice={}, maxPrice={}, maxDays={}, priceReduced={}, limit={}, cursor={}, includeInactive={}",
+                searchParams.getNeighbourhood(), searchParams.getType(), searchParams.getMin_beds(), searchParams.getMax_beds(),
+                searchParams.getMin_price(), searchParams.getMax_price(), searchParams.getMax_days(), searchParams.getPrice_reduced(),
+                searchParams.getLimit(), searchParams.getCursor(), searchParams.getInclude_inactive());
 
         Specification<Listing> specWithoutCursor = Specification
                 .where(hasNeighbourhood(searchParams.getNeighbourhood()))
@@ -69,9 +80,12 @@ public class ListingService {
         Listing lastListing = null;
         if (searchParams.getCursor() != null && !searchParams.getCursor().isBlank()) {
             Long lastId = CursorPagination.decode(searchParams.getCursor());
+            log.debug("Decoded pagination cursor value to Listing ID: {}", lastId);
             if (lastId != null) {
-                lastListing = listingRepository.findById(lastId)
-                        .orElseThrow(() -> new BadRequestException("Invalid cursor: listing not found"));
+                lastListing = listingRepository.findById(lastId).orElseThrow(() -> {
+                    log.warn("Invalid pagination cursor. Listing ID {} does not exist", lastId);
+                    return new BadRequestException("Invalid cursor: listing not found");
+                });
             }
         }
 
@@ -85,6 +99,7 @@ public class ListingService {
 
         List<Listing> content = listingPage.getContent();
         if (content.isEmpty() && lastListing == null) {
+            log.warn("No listings found matching the specified query filters.");
             throw new ResourceNotFoundException("No listings found");
         }
 
@@ -95,6 +110,7 @@ public class ListingService {
         if (!finalContent.isEmpty() && hasMore) {
             Listing nextLastListing = finalContent.get(finalContent.size() - 1);
             nextCursor = CursorPagination.encode(nextLastListing.getId());
+            log.debug("Generated next page pagination cursor: {}", nextCursor);
         }
 
         long totalCount = listingRepository.count(specWithoutCursor);
@@ -109,18 +125,23 @@ public class ListingService {
                 .map(listingMapper::toListingData)
                 .toList();
 
+        log.info("Successfully retrieved {} listings (total match count: {})", finalContent.size(), totalCount);
         return new ListingResponse(data, meta);
     }
 
     public Sort resolveSort(String sort) throws BadRequestException {
+        log.debug("Resolving sorting criteria for Listings: {}", sort);
         return switch (sort == null ? "newest" : sort) {
             case "price_asc" -> Sort.by(Sort.Direction.ASC, "priceKobo").and(Sort.by(Sort.Direction.ASC, "id"));
             case "price_desc" -> Sort.by(Sort.Direction.DESC, "priceKobo").and(Sort.by(Sort.Direction.DESC, "id"));
             case "days_asc" -> Sort.by(Sort.Direction.ASC, "firstSeenAt").and(Sort.by(Sort.Direction.ASC, "id"));
             case "newest" -> Sort.by(Sort.Direction.DESC, "firstSeenAt").and(Sort.by(Sort.Direction.DESC, "id"));
-            default -> throw new BadRequestException(
-                    "Invalid sort option: %s. Valid options: price_asc, price_desc, newest, days_asc".formatted(sort)
-            );
+            default -> {
+                log.warn("Invalid listing sorting option requested: {}", sort);
+                throw new BadRequestException(
+                        "Invalid sort option: %s. Valid options: price_asc, price_desc, newest, days_asc".formatted(sort)
+                );
+            }
         };
     }
 }

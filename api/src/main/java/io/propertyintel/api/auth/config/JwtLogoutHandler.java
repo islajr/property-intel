@@ -42,21 +42,16 @@ public class JwtLogoutHandler implements LogoutHandler {
         this.resolver = resolver;
     }
 
-
     @Transactional
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, @Nullable Authentication authentication) {
         try {
-            /*
-             * Invalidates refresh tokens and logs user out effectively
-             * */
-
-
-            // Checks to properly validate signed-in user before logout procedure
+            log.info("Processing logout request for user.");
 
             final String authHeader = request.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                log.warn("Logout request failed. Authorization header is missing or incorrect.");
                 throw new UnauthorizedException("Missing Access Token");
             }
 
@@ -64,31 +59,28 @@ public class JwtLogoutHandler implements LogoutHandler {
             String email = jwtService.extractEmail(accessToken);
             UserPrincipal user = (UserPrincipal) userDetailsService.loadUserByUsername(email);
 
-            // Upon access failure, client-side should try a quick refresh
-            if (!jwtService.isTokenValid(accessToken, user)) throw new UnauthorizedException("Invalid or Expired Access token");
+            if (!jwtService.isTokenValid(accessToken, user)) {
+                log.warn("Logout request failed. Provided access token is invalid or expired for user: {}", email);
+                throw new UnauthorizedException("Invalid or Expired Access token");
+            }
 
             String refreshToken = extractRefreshToken(request);
 
             if (refreshToken != null) {
                 refreshTokenService.revokeToken(refreshToken);
-                log.debug("Revoked refresh token");
+                log.debug("Successfully revoked refresh token database entry for user: {}", email);
 
-                ResponseCookie deleteCookie = ResponseCookie.from(
-                                "refreshToken"
-                        )
+                ResponseCookie deleteCookie = ResponseCookie.from("refreshToken")
                         .httpOnly(true)
                         .secure(true)
                         .path("/api/v1/auth")
                         .maxAge(0)
                         .build();
 
-                log.info("Deleted refresh token cookie");
-
-                response.addHeader(
-                        HttpHeaders.SET_COOKIE, deleteCookie.toString()
-                );
+                response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+                log.info("Successfully deleted refresh token cookie for user: {}", email);
             } else {
-                log.debug("No refresh token found");
+                log.warn("Logout request failed. No refresh token cookie was found for user: {}", email);
                 throw new UnauthorizedException("No refresh token cookie found");
             }
 
@@ -96,24 +88,32 @@ public class JwtLogoutHandler implements LogoutHandler {
             HttpSession session = request.getSession(false);
             if (session != null) {
                 session.invalidate();
-                log.debug("Invalidated session");
+                log.debug("Successfully invalidated HTTP session for user: {}", email);
             }
 
             // Clear security context
             SecurityContextHolder.clearContext();
-            log.debug("Cleared security context");
+            log.info("Successfully cleared security context. Logout complete for user: {}", email);
         } catch (Exception ex) {
+            log.error("Error occurred during logout request resolution: {}", ex.getMessage());
             resolver.resolveException(request, response, null, ex);
         }
     }
 
     private String extractRefreshToken(HttpServletRequest request) {
-        if (request.getCookies() == null) log.warn("Request cookies empty. Failed to obtain refresh token`");
-
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("refreshToken")) return cookie.getValue();
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            log.warn("Request cookies array is null. Failed to obtain refresh token.");
+            return null;
         }
 
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                return cookie.getValue();
+            }
+        }
+
+        log.debug("No cookie named 'refreshToken' was found in request.");
         return null;
     }
 }

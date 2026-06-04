@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -54,8 +56,11 @@ public class JwtFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             final String authPrefix = "Bearer ";
 
+            log.debug("Intercepting request for path: {} with JWTFilter", request.getServletPath());
+
             // Check for auth header
             if (authHeader == null || !authHeader.startsWith(authPrefix)) {
+                log.warn("Access denied. Authorization header is incorrect or missing on path: {}", request.getServletPath());
                 throw new BadRequestException("Authorization header is incorrect");
             }
 
@@ -74,9 +79,11 @@ public class JwtFilter extends OncePerRequestFilter {
                             .buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    log.info("Request authenticated successfully. User principal set for: {}", email);
                 }
             }
         } catch (Exception ex) {
+            log.warn("JWT authorization verification failed for path: {} - Reason: {}", request.getServletPath(), ex.getMessage());
             resolver.resolveException(request, response, null, ex);
             return;
         }
@@ -87,8 +94,11 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String currPath = request.getServletPath();
-
-        return excludedPaths.stream()
+        boolean matchesExclusion = excludedPaths.stream()
                 .anyMatch(path -> pathMatcher.match(path, currPath));
+        if (matchesExclusion) {
+            log.debug("Bypassing JWT filter for excluded path: {}", currPath);
+        }
+        return matchesExclusion;
     }
 }

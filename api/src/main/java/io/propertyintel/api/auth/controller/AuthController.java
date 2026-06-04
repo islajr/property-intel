@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication Operations", description = "Provides signup, login, and token refresh capabilities")
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -44,8 +46,10 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        log.info("REST request to login user: {}", loginRequest.email());
         AuthResult result = authService.login(loginRequest);
         ResponseCookie cookie = createCookieToken(result.refreshToken());
+        log.info("Successfully completed login REST endpoint for user: {}", loginRequest.email());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new AuthResponse(result.accessToken(), result.expiresIn()));
@@ -62,8 +66,10 @@ public class AuthController {
     @PostMapping("/register")
     @Idempotent
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        log.info("REST request to register user: {}", registerRequest.email());
         AuthResult result = authService.register(registerRequest);
         ResponseCookie cookie = createCookieToken(result.refreshToken());
+        log.info("Successfully completed register REST endpoint for user: {}", registerRequest.email());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new AuthResponse(result.accessToken(), result.expiresIn()));
@@ -79,8 +85,10 @@ public class AuthController {
     })
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@CookieValue(name = "refreshToken") String refreshToken) {
+        log.info("REST request to refresh access token using cookie.");
         AuthResult result = authService.refresh(refreshToken);
         ResponseCookie cookie = createCookieToken(result.refreshToken());
+        log.info("Successfully completed refresh token REST endpoint.");
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new AuthResponse(result.accessToken(), result.expiresIn()));

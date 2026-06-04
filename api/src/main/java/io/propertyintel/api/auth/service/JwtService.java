@@ -7,6 +7,7 @@ import io.propertyintel.api.auth.entity.User;
 import io.propertyintel.api.auth.entity.UserPrincipal;
 import io.propertyintel.api.auth.util.RSAKeyProperties;
 import io.propertyintel.api.global.exception.exceptions.UnauthorizedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 @Service
+@Slf4j
 public class JwtService {
 
     private final RSAPrivateKey privateKey;
@@ -29,6 +31,7 @@ public class JwtService {
     }
 
     public String generateToken(User user) {
+        log.info("Generating JWT access token for user: {}", user.getEmail());
         return Jwts.builder()
                 .subject(user.getEmail())
                 .issuedAt(new Date())
@@ -43,18 +46,27 @@ public class JwtService {
         try {
             return extractClaims(token).getSubject();
         } catch (JwtException ex) {
+            log.warn("Failed to extract email from JWT token. Reason: {}", ex.getMessage());
             throw new UnauthorizedException("Invalid or Expired access token");
         }
     }
 
     public boolean isTokenValid(String token, UserPrincipal user) {
-        return extractEmail(token).equals(user.getUsername()) && !isTokenExpired(token);
+        boolean emailMatch = extractEmail(token).equals(user.getUsername());
+        boolean expired = isTokenExpired(token);
+        log.debug("Verifying JWT token validity. Email Match: {}, Is Expired: {}", emailMatch, expired);
+        return emailMatch && !expired;
     }
 
     private boolean isTokenExpired(String token) {
         try {
-            return extractClaims(token).getExpiration().before(new Date());
+            boolean isExpired = extractClaims(token).getExpiration().before(new Date());
+            if (isExpired) {
+                log.warn("JWT token has expired.");
+            }
+            return isExpired;
         } catch (JwtException ex) {
+            log.warn("Failed to check JWT token expiration status. Reason: {}", ex.getMessage());
             throw new UnauthorizedException("Invalid or Expired access token");
         }
     }
@@ -66,5 +78,4 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }
