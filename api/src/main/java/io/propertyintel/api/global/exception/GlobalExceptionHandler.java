@@ -35,7 +35,11 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message, HttpServletRequest request, Throwable ex) {
-        log.error("Exception occurred: {} -> {}", message, ex.getMessage(), ex);
+        if (status.is5xxServerError()) {
+            log.error("Server Error: Path='{}', Status='{}', Message='{}'", request.getRequestURI(), status, message, ex);
+        } else {
+            log.warn("Client Error: Path='{}', Status='{}', Message='{}'", request.getRequestURI(), status, message);
+        }
         ErrorResponse errorResponse = new ErrorResponse(
                 status.name(),
                 message,
