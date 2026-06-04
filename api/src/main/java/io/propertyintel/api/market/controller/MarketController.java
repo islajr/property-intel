@@ -37,13 +37,12 @@ public class MarketController {
             @Parameter(description = "Items per page (minimum = 0, maximum = 50)", example = "10")
             @Min(value = 1, message = "Cannot request fewer than 1 item per page")
             @Max(value = 50, message = "Cannot request more than 50 items per page")
-            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false, defaultValue = "20") Integer limit,
 
-            @Parameter(description = "Page number offset (example = 5)", example = "5")
-            @Min(value = 0, message = "Page number cannot be negative")
-            @RequestParam(required = false) Integer page
+            @Parameter(description = "Cursor Pagination value", example = "EjwuyVbrlox")
+            @RequestParam(required = false) String cursor
             ) {
-        return ResponseEntity.ok(marketService.getNeighbourhoods(sort_by, limit, page));
+        return ResponseEntity.ok(marketService.getNeighbourhoods(sort_by, limit, cursor));
     }
 
     @Operation(summary = "Find information on specific neighbourhood markets",

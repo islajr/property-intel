@@ -3,7 +3,6 @@ package io.propertyintel.api.market.mapper;
 import io.propertyintel.api.market.entity.Market;
 import io.propertyintel.api.market.entity.MarketPercentiles;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
-import io.propertyintel.api.market.dto.NeighbourhoodSummary;
 import io.propertyintel.api.market.dto.NeighbourhoodSummaryData;
 import io.propertyintel.api.market.dto.NeighbourhoodSummaryMeta;
 import io.propertyintel.api.global.util.CurrencyUtils;
@@ -14,19 +13,12 @@ import org.springframework.data.domain.Page;
 @Mapper(componentModel = "spring", imports = CurrencyUtils.class)
 public interface MarketMapper {
 
-    @Mapping(source = "content", target = "data")
-    @Mapping(source = ".", target = "meta")
-    NeighbourhoodSummary toPaginatedResponse(Page<Market> markets);
-
     @Mapping(target = "formattedMedianPrice",
             expression = "java(CurrencyUtils.formatDoubleKoboToNaira(market.getMedianPriceKobo()))")
     NeighbourhoodSummaryData toNeighbourhoodSummary(Market market);
 
     @Mapping(source = "totalElements", target = "count")
-    @Mapping(source = "number", target = "pageNumber")
-    @Mapping(source = "totalPages", target = "pageCount")
-    @Mapping(source = "size", target = "pageSize")
-    @Mapping(source = "last", target = "isLast")
+    @Mapping(source = "last", target = "hasMore")
     NeighbourhoodSummaryMeta toNeighbourhoodSummaryMeta(Page<?> page);
 
     @Mapping(target = "formattedMedianPrice",

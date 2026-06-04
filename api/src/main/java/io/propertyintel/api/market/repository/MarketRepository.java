@@ -2,20 +2,51 @@ package io.propertyintel.api.market.repository;
 
 import io.propertyintel.api.market.entity.Market;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
 public interface MarketRepository extends JpaRepository<Market, String> {
 
-    Optional<Market> findByNeighbourhood(String neighbourhood);
-    List<Market> findByCity(String city);
-    List<Market> findByCityAndNeighbourhood(String city, String neighbourhood);
+    @Query(value = """
+    SELECT * FROM market.neighbourhood_snapshots
+    WHERE neighbourhood = :neighbourhood
+    ORDER BY snapshot_week DESC LIMIT 1
+    """, nativeQuery = true)
+    Optional<Market> findLatestRecordByNeighbourhood(@Param("neighbourhood") String neighbourhood);
+
+    @Query(value = """
+    SELECT DISTINCT ON (neighbourhood) * FROM market.neighbourhood_snapshots
+    ORDER BY neighbourhood, snapshot_week DESC
+    """, countQuery = """
+    SELECT COUNT(*) FROM (
+        SELECT DISTINCT ON (neighbourhood) id
+        FROM market.neighbourhood_snapshots
+    ) AS total_count
+    """, nativeQuery = true)
+    Page<Market> findMarketSummary(Pageable pageable);
+
+    @Query(value = """
+    SELECT DISTINCT ON (neighbourhood) * FROM market.neighbourhood_snapshots
+        WHERE (:idAfter IS NULL OR id > :idAfter)
+    ORDER BY neighbourhood, snapshot_week DESC
+    """, countQuery = """
+    SELECT COUNT(*) FROM (
+        SELECT DISTINCT ON (neighbourhood) id
+        FROM market.neighbourhood_snapshots
+    ) AS total_count
+    """, nativeQuery = true)
+    Page<Market> findMarketSummaryWithCursor(@Param("idAfter")String idAfter, Pageable pageable);
+
+    long countMarketBySnapshotWeek(LocalDate snapshotWeek);
 
     @Modifying
     @Transactional
