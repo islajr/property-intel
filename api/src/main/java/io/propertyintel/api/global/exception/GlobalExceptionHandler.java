@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -45,8 +46,8 @@ public class GlobalExceptionHandler {
     }
 
     // 400 - Bad Request
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex, HttpServletRequest request) {
+    @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, ex);
     }
 
@@ -63,6 +64,25 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
+
+        String detailMessage = "Validation failed for fields: " + errors;
+        return buildResponse(HttpStatus.BAD_REQUEST, detailMessage, request, ex);
+    }
+
+    // 400 - Validation Errors (Unified Response format)
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleMethodValidationErrors(HandlerMethodValidationException ex, HttpServletRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        // loop through each failing method parameter
+        ex.getParameterValidationResults().forEach(result -> {
+            String fieldName = result.getMethodParameter().getParameterName();
+
+            // loop through specific constraint violations on said parameter
+            result.getResolvableErrors().forEach(error ->
+                    errors.put(fieldName, error.getDefaultMessage()));
+        });
 
         String detailMessage = "Validation failed for fields: " + errors;
         return buildResponse(HttpStatus.BAD_REQUEST, detailMessage, request, ex);
