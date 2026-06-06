@@ -3,10 +3,7 @@ package io.propertyintel.api.market.service;
 import io.propertyintel.api.global.caching.CacheNames;
 import io.propertyintel.api.global.exception.exceptions.BadRequestException;
 import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
-import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
-import io.propertyintel.api.market.dto.NeighbourhoodSummary;
-import io.propertyintel.api.market.dto.NeighbourhoodSummaryData;
-import io.propertyintel.api.market.dto.NeighbourhoodSummaryMeta;
+import io.propertyintel.api.market.dto.*;
 import io.propertyintel.api.market.entity.Market;
 import io.propertyintel.api.market.mapper.MarketMapper;
 import io.propertyintel.api.market.repository.MarketRepository;
@@ -106,6 +103,24 @@ public class MarketService {
         NeighbourhoodStatsResponse statsResponse = marketMapper.toStatsResponse(market);
         log.info("Successfully retrieved stats for neighbourhood: {}", neighbourhood);
         return statsResponse;
+    }
+
+    @Cacheable(value = CacheNames.MARKET_TRENDS, key = "#neighbourhood")
+    public NeighbourhoodTrendResponse getNeighbourhoodTrends(String neighbourhood) {
+        log.info("Fetching trends for neighbourhood: {}", neighbourhood);
+        List<Market> marketTrends = marketRepository.findMarketTrends(neighbourhood);
+
+        if (marketTrends.isEmpty()) {
+            log.warn("No trend data found for neighbourhood: {}", neighbourhood);
+            throw new ResourceNotFoundException("No trend data for requested neighbourhood: %s".formatted(neighbourhood));
+        }
+
+        List<NeighbourhoodTrendStats> trendStats = marketTrends.stream()
+                .map(marketMapper::toNeighbourhoodTrendStats)
+                .toList();
+
+        log.info("Successfully retrieved trend stats for neighbourhood: {}", neighbourhood);
+        return new NeighbourhoodTrendResponse(neighbourhood, trendStats);
     }
 
     public Sort resolveSort(String sort) {

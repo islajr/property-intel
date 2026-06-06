@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -46,7 +47,12 @@ public interface MarketRepository extends JpaRepository<Market, String> {
     """, nativeQuery = true)
     Page<Market> findMarketSummaryWithCursor(@Param("idAfter")String idAfter, Pageable pageable);
 
-    long countMarketBySnapshotWeek(LocalDate snapshotWeek);
+    @Query(value = """
+    SELECT * FROM market.neighbourhood_snapshots
+        WHERE neighbourhood = :neighbourhood
+    ORDER BY snapshot_week DESC LIMIT 12
+    """, nativeQuery = true)
+    List<Market> findMarketTrends(String neighbourhood);
 
     @Modifying
     @Transactional

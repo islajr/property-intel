@@ -1,9 +1,10 @@
 package io.propertyintel.api.market.controller;
 
 import io.propertyintel.api.global.exception.ErrorResponse;
-import io.propertyintel.api.market.service.MarketService;
 import io.propertyintel.api.market.dto.NeighbourhoodStatsResponse;
 import io.propertyintel.api.market.dto.NeighbourhoodSummary;
+import io.propertyintel.api.market.dto.NeighbourhoodTrendResponse;
+import io.propertyintel.api.market.service.MarketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -66,5 +67,18 @@ public class MarketController {
             @Parameter(description = "Neighbourhood name", example = "Ajah", required = true)
                  @PathVariable String neighbourhood) {
         return ResponseEntity.ok(marketService.getNeighbourhoodStats(neighbourhood));
+    }
+
+    @Operation(summary = "Get twelve-week trend information on specific neighbourhood markets",
+            description = "Returns time-series price trend information on requested neighbourhood over three months")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Neighbourhood data successfully retrieved.",
+                    content = @Content(schema = @Schema(implementation = NeighbourhoodTrendResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No available data for requested neighbourhood",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/v1/market/neighbourhoods/{name}/trends")
+    public ResponseEntity<NeighbourhoodTrendResponse> getNeighbourhoodTrends(@PathVariable String name) {
+        return ResponseEntity.ok(marketService.getNeighbourhoodTrends(name));
     }
 }
