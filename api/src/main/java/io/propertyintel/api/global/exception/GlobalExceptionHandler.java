@@ -1,9 +1,6 @@
 package io.propertyintel.api.global.exception;
 
-import io.propertyintel.api.global.exception.exceptions.BadRequestException;
-import io.propertyintel.api.global.exception.exceptions.ForbiddenException;
-import io.propertyintel.api.global.exception.exceptions.ResourceNotFoundException;
-import io.propertyintel.api.global.exception.exceptions.UnauthorizedException;
+import io.propertyintel.api.global.exception.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -113,6 +110,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodNotAllowedException.class, HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ErrorResponse> handleMethodNotAllowedException(Exception ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage(), request, ex);
+    }
+
+    // 429 - Too many requests
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitException(Exception ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request, ex);
+    }
+
+    public ResponseEntity<ErrorResponse> handleEmailVerifiedException(Exception ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, ex);
     }
 
     // 500 - Fallback Handler for ALL unhandled exceptions
