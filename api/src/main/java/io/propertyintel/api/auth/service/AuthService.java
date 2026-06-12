@@ -6,6 +6,7 @@ import io.propertyintel.api.auth.dto.RegisterRequest;
 import io.propertyintel.api.auth.entity.RefreshToken;
 import io.propertyintel.api.auth.entity.User;
 import io.propertyintel.api.auth.entity.UserPrincipal;
+import io.propertyintel.api.auth.entity.enums.UserStatus;
 import io.propertyintel.api.auth.repository.UserRepository;
 import io.propertyintel.api.global.exception.exceptions.BadRequestException;
 import io.propertyintel.api.global.exception.exceptions.UnauthorizedException;
@@ -31,6 +32,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailVerificationService emailVerificationService;
 
     @Value("${accesstoken.expiry.seconds}")
     private Integer accessTokenExpirySeconds;
@@ -79,13 +81,14 @@ public class AuthService {
                 .email(registerRequest.email())
                 .password(passwordEncoder.encode(registerRequest.password()))
                 .isEmailVerified(false)
+                .userStatus(UserStatus.UNVERIFIED)
                 .build();
 
         userRepository.save(user);
         log.debug("Created new user {}", user.getEmail());
 
-        // TODO: Verify user email (background job)
-        // emailVerificationService.sendVerificationEmail(user);
+        // asynchronous job to issue and send verification e-mails
+        emailVerificationService.issueAndSendVerificationEmail(user);
 
         String accessToken = jwtService.generateToken(user);
         log.debug("Generated access token for new user: {}", user.getEmail());

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PropertyIntel — Confirm your email</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+             background:#f4f4f5; margin:0; padding:40px 0;">
+<div style="max-width:520px; margin:0 auto; background:#fff;
+              border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.1);">
+    <div style="background:#18181b; padding:24px 32px;">
+        <h1 style="color:#fff; margin:0; font-size:20px;">PropertyIntel</h1>
+    </div>
+    <div style="padding:32px;">
+        <h2 style="margin-top:0;">Confirm your email address</h2>
+        <p>Hello there,</p>
+        <p>Thank you for signing up to <strong>PropertyIntel</strong>. Click the button below to verify your email.
+            The link expires in <strong th:text="${expiryHours}">24</strong> hours.</p>
+        <a th:href="${verificationURL}"
+           style="display:inline-block; background:#18181b; color:#fff;
+                padding:12px 24px; border-radius:6px; text-decoration:none;
+                font-weight:600; margin:16px 0;">
+            Verify Email Address
+        </a>
+        <p style="font-size:13px; color:#71717a; margin-top:24px;">
+            If you didn't create an account, you can safely ignore this email.
+        </p>
+        <p style="font-size:12px; color:#a1a1aa;">
+            Or copy this URL into your browser:<br>
+            <span th:text="${verificationURL}" style="word-break:break-all;"></span>
+        </p>
+    </div>
+</div>
+</body>
+</html>

@@ -56,6 +56,12 @@
             <version>3.0.2</version>
         </dependency>
 
+        <!-- Thymeleaf Templating -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!-- Security -->
        <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,6 +118,15 @@
             <artifactId>mapstruct</artifactId>
             <version>1.5.5.Final</version>
         </dependency>
+
+        <!-- Resend -->
+        <dependency>
+            <groupId>com.resend</groupId>
+            <artifactId>resend-java</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+
 
         <!-- Runtime dependencies -->
         <dependency>
