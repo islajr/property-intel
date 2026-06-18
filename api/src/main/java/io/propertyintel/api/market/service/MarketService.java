@@ -127,10 +127,10 @@ public class MarketService {
         log.debug("Resolving sort criteria for: {}", sort);
         return switch (sort == null ? "neighbourhood" : sort) {
             case "neighbourhood" -> Sort.by(Sort.Direction.ASC, "neighbourhood");
-            case "new_listings" -> Sort.by(Sort.Direction.DESC, "newListingsThisWeek");
-            case "price_reduced" -> Sort.by(Sort.Direction.DESC, "priceReducedThisWeek");
-            case "median_price" -> Sort.by(Sort.Direction.DESC, "medianPriceKobo");
-            case "active_listings" -> Sort.by(Sort.Direction.DESC, "activeListingCount");
+            case "new_listings" -> Sort.by(Sort.Direction.DESC, "new_listings_count");
+            case "price_reduced" -> Sort.by(Sort.Direction.DESC, "price_reduced_count");
+            case "median_price" -> Sort.by(Sort.Direction.DESC, "median_price_kobo");
+            case "active_listings" -> Sort.by(Sort.Direction.DESC, "active_listing_count");
             default -> {
                 log.warn("Invalid sorting option provided: {}", sort);
                 throw new IllegalArgumentException(
