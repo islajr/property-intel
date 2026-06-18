@@ -77,11 +77,11 @@ public class ListingSpecifications {
 
     public static Specification<Listing> hasReducedPrice(Boolean reducedPrice) {
         return (root, query, cb) -> {
+            if (reducedPrice == null || !reducedPrice) return cb.conjunction(); // safe no-op predicate
 
             query.distinct(true);
             Join<Listing, PriceHistory> priceHistoryJoin = root.join("priceHistory", JoinType.INNER);
 
-            if (reducedPrice == null || !reducedPrice) return null;
 
             return cb.and(
                     cb.equal(priceHistoryJoin.get("eventType"), "PRICE_CHANGE"),
