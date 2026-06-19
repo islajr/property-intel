@@ -12,7 +12,7 @@ public class CurrencyUtils {
         double naira = kobo / 100.0;
         NumberFormat formatter = NumberFormat.getCurrencyInstance(NIGERIA_LOCALE);
 
-        return formatter.format(kobo);
+        return formatter.format(naira);
     }
 
     public static String formatDoubleKoboToNaira(Double kobo) {
@@ -21,7 +21,7 @@ public class CurrencyUtils {
         double naira = kobo / 100.0;
         NumberFormat formatter = NumberFormat.getCurrencyInstance(NIGERIA_LOCALE);
 
-        return formatter.format(kobo);
+        return formatter.format(naira);
     }
 
 
