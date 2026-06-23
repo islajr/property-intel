@@ -55,11 +55,6 @@ To overcome database seeding challenges, the project enforces production test di
    ./mvnw clean test
    ```
 
-### 📖 Detailed Testing Guide
-For a deep dive into the testing architecture (including context caching optimizations, WebMvc slice testing, filter stubbing, and Testcontainer singleton lifecycles), please refer to the dedicated testing guide:
-
-👉 **[Comprehensive TESTING.md Guide](api/TESTING.md)**
-
 ---
 
 ## 📖 Integration & API Specifications
