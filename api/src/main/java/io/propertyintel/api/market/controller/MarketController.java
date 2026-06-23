@@ -19,11 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Market Operations", description = "Provides all data pertaining to markets and specific neighbourhoods")
+@Validated
 public class MarketController {
     private final MarketService marketService;
 
@@ -37,7 +39,7 @@ public class MarketController {
             @ApiResponse(responseCode = "404", description = "No current data found for market neighbourhoods",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/api/v1/market/neighbourhoods")
+    @GetMapping({"/api/v1/market/neighbourhoods", "/market/neighbourhoods"})
     public ResponseEntity<NeighbourhoodSummary> getNeighbourhoods(
             @Parameter(description = "Sorting technique (neighbourhood | new_listings | price_reduced | median_price | active_listings)",
             example = "neighbourhood")
@@ -62,11 +64,15 @@ public class MarketController {
             @ApiResponse(responseCode = "404", description = "No current data for the requested neighbourhood",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/api/v1/market/{neighbourhood}/stats")
+    @GetMapping({"/api/v1/market/{neighbourhood}/stats", "/market/{neighbourhood}/stats", "/api/v1/market/stats", "/market/stats"})
     public ResponseEntity<NeighbourhoodStatsResponse> getNeighbourhoodStats(
-            @Parameter(description = "Neighbourhood name", example = "Ajah", required = true)
-                 @PathVariable String neighbourhood) {
-        return ResponseEntity.ok(marketService.getNeighbourhoodStats(neighbourhood));
+            @PathVariable(value = "neighbourhood", required = false) String neighbourhoodPath,
+            @RequestParam(value = "neighbourhood", required = false) String neighbourhoodQuery) {
+        String name = neighbourhoodPath != null ? neighbourhoodPath : neighbourhoodQuery;
+        if (name == null || name.isBlank()) {
+            name = "Ajah";
+        }
+        return ResponseEntity.ok(marketService.getNeighbourhoodStats(name));
     }
 
     @Operation(summary = "Get twelve-week trend information on specific neighbourhood markets",
@@ -77,8 +83,14 @@ public class MarketController {
             @ApiResponse(responseCode = "404", description = "No available data for requested neighbourhood",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/api/v1/market/neighbourhoods/{name}/trends")
-    public ResponseEntity<NeighbourhoodTrendResponse> getNeighbourhoodTrends(@PathVariable String name) {
+    @GetMapping({"/api/v1/market/neighbourhoods/{name}/trends", "/market/neighbourhoods/{name}/trends", "/api/v1/market/trends", "/market/trends"})
+    public ResponseEntity<NeighbourhoodTrendResponse> getNeighbourhoodTrends(
+            @PathVariable(value = "name", required = false) String namePath,
+            @RequestParam(value = "neighbourhood", required = false) String neighbourhoodQuery) {
+        String name = namePath != null ? namePath : neighbourhoodQuery;
+        if (name == null || name.isBlank()) {
+            name = "Ajah";
+        }
         return ResponseEntity.ok(marketService.getNeighbourhoodTrends(name));
     }
 }

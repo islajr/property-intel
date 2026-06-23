@@ -36,7 +36,7 @@ public class ListingController {
             @ApiResponse(responseCode = "404", description = "No listings found matching the criteria",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/api/v1/listings")
+    @GetMapping({"/api/v1/listings", "/listings"})
     public ResponseEntity<ListingResponse> getListings(@Valid ListingSearchParams searchParams) {
         return ResponseEntity.ok(listingService.getListings(searchParams));
     }
@@ -49,7 +49,7 @@ public class ListingController {
             @ApiResponse(responseCode = "404", description = "Listing with the specified id not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/api/v1/listings/{id}")
+    @GetMapping({"/api/v1/listings/{id}", "/listings/{id}"})
     public ResponseEntity<ListingDetailResponse> getListing(
             @Parameter(description = "Listing id", example = "23", required = true)
             @PathVariable Long id) {
