@@ -1,6 +1,7 @@
 # Property Intelligence Platform
 
-[![Build Status](https://github.com/islajr/property-intel/actions/workflows/ci.yml/badge.svg)](https://github.com/islajr/property-intel/actions)
+[![Property Intel CI](https://github.com/islajr/property-intel/actions/workflows/ci.yml/badge.svg)](https://github.com/islajr/property-intel/actions)
+[![Coverage](.github/badges/jacoco.svg)](api/target/site/jacoco/index.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A real-time data intelligence and market analytics engine for the residential real-estate market in Nigeria. The platform structures, normalizes, and tracks property listings from multiple portals over time, providing APIs for listings, neighbourhood-level statistics, percentiles, and market trends.
@@ -54,6 +55,17 @@ To overcome database seeding challenges, the project enforces production test di
    ```bash
    ./mvnw clean test
    ```
+
+### 📊 Code Coverage
+Test coverage is tracked automatically via JaCoCo on every test execution. The latest aggregated results are:
+
+| Metric | Coverage % |
+| --- | --- |
+| **Instruction Coverage** | 76.32% |
+| **Line Coverage** | 74.47% |
+| **Branch Coverage** | 58.54% |
+
+Detailed package and class breakdown reports are generated locally at `api/target/site/jacoco/index.html` after running the test suite.
 
 ---
 

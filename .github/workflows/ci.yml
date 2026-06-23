@@ -1,4 +1,4 @@
-name: API CI
+name: Property Intel CI
 
 on:
   push:
@@ -10,6 +10,9 @@ jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Code
@@ -31,3 +34,19 @@ jobs:
       - name: Run Integration & Unit Tests
         run: ./mvnw clean test
         working-directory: api
+
+      - name: Generate JaCoCo Badge
+        id: jacoco
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: api/target/site/jacoco/jacoco.csv
+          badges-directory: .github/badges
+          generate-branches-badge: true
+
+      - name: Commit and push the badge
+        if: github.event_name == 'push'
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: 'ci: (api) update test coverage badge [skip ci]'
+          add: '.github/badges/*.svg'
