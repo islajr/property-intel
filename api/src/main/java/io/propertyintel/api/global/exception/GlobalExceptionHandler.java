@@ -89,6 +89,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, detailMessage, request, ex);
     }
 
+    // 400 - Constraint Violations
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(jakarta.validation.ConstraintViolationException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, ex);
+    }
+
     // 401 - Unauthorized
     @ExceptionHandler({InsufficientAuthenticationException.class, UnauthorizedException.class, BadCredentialsException.class, MissingRequestCookieException.class, AuthenticationException.class})
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(Exception ex, HttpServletRequest request) {

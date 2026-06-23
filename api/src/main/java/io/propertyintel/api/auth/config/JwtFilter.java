@@ -32,9 +32,13 @@ public class JwtFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludedPaths = Arrays.asList(
             "/api/v1/auth/login",
+            "/auth/login",
             "/api/v1/auth/register",
+            "/auth/register",
             "/api/v1/auth/refresh",
+            "/auth/refresh",
             "/api/v1/auth/verify-email",
+            "/auth/verify-email",
             "/error",
             "/swagger-ui/**",
             "/v3/api-docs/**",
@@ -42,8 +46,11 @@ public class JwtFilter extends OncePerRequestFilter {
             "/**/swagger-ui.html",
             "/webjars/**",
             "/api/v1/listings/**",
+            "/listings/**",
             "/api/v1/market/**",
-            "/api/v1/search"
+            "/market/**",
+            "/api/v1/search",
+            "/search"
     );
 
     public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
@@ -61,8 +68,12 @@ public class JwtFilter extends OncePerRequestFilter {
             log.debug("Intercepting request for path: {} with JWTFilter", request.getServletPath());
 
             // Check for auth header
-            if (authHeader == null || !authHeader.startsWith(authPrefix)) {
-                log.warn("Access denied. Authorization header is incorrect or missing on path: {}", request.getServletPath());
+            if (authHeader == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (!authHeader.startsWith(authPrefix)) {
+                log.warn("Access denied. Authorization header is incorrect on path: {}", request.getServletPath());
                 throw new BadRequestException("Authorization header is incorrect");
             }
 
