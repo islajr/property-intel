@@ -22,6 +22,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Generate Temporary JWT Keys for Tests
+        run: |
+          mkdir -p api/src/main/resources/keys
+          openssl genpkey -algorithm RSA -out api/src/main/resources/keys/private.pem -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -pubout -in api/src/main/resources/keys/private.pem -out api/src/main/resources/keys/public.pem
+
       - name: Run Integration & Unit Tests
         run: ./mvnw clean test
         working-directory: api
