@@ -206,7 +206,7 @@ textarea:focus-visible,
   border-width: 0;
 }
 
-/* ── Prefers Reduced Motion ── */
+/* ── Prefers Reduced Motion (Global Standards Override) ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
