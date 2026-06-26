@@ -6,6 +6,10 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
   borderRadius?: string | number;
 }
 
+/**
+ * A shimmer placeholder loading skeleton for all data-fetching views,
+ * including Home, Listings, ListingDetail, Market, and Neighbourhood pages.
+ */
 export function Skeleton({
   width = '100%',
   height = '20px',
