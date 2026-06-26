@@ -7,6 +7,7 @@ import ListingCard from '../components/listing/ListingCard';
 import Skeleton from '../components/primitives/Skeleton';
 import Badge from '../components/primitives/Badge';
 import Button from '../components/primitives/Button';
+import { Sparkline } from '../components/market/Sparkline';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -238,6 +239,7 @@ export default function Home() {
                     <span className="trending-stat-val font-numeric text-amber">{n.formattedMedianPrice}</span>
                   </div>
                 </div>
+                <Sparkline neighbourhood={n.neighbourhood} />
               </Link>
             ))
           )}
