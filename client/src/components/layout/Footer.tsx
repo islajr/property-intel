@@ -20,7 +20,7 @@ export default function Footer() {
             <ExternalLink size={12} className="footer-link-icon" />
           </a>
           <a 
-            href="https://github.com" 
+            href="https://github.com/islajr/property-intel" 
             target="_blank" 
             rel="noopener noreferrer"
             className="footer-link"
