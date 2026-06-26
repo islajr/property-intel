@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw, X } from 'lucide-react';
 import { market } from '../../api';
 import Input from '../primitives/Input';
 import Select from '../primitives/Select';
@@ -11,6 +11,8 @@ export interface FilterSidebarProps {
   currentFilters: ListingSearchParams;
   onApply: (filters: Partial<ListingSearchParams>) => void;
   onReset: () => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 const PROPERTY_TYPE_OPTIONS = [
@@ -32,7 +34,13 @@ const BEDROOM_OPTIONS = [
   { value: '5', label: '5+' },
 ];
 
-export function FilterSidebar({ currentFilters, onApply, onReset }: FilterSidebarProps) {
+export function FilterSidebar({
+  currentFilters,
+  onApply,
+  onReset,
+  isOpenMobile = false,
+  onCloseMobile,
+}: FilterSidebarProps) {
   // Fetch neighbourhoods to populate select list
   const { data: neighbourhoodsData } = useQuery({
     queryKey: ['market', 'neighbourhoods'],
@@ -65,6 +73,42 @@ export function FilterSidebar({ currentFilters, onApply, onReset }: FilterSideba
   const [priceReduced, setPriceReduced] = useState(!!currentFilters.price_reduced);
   const [includeInactive, setIncludeInactive] = useState(!!currentFilters.include_inactive);
 
+  // Swipe-down-to-close touch logic
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.targetTouches[0];
+    if (touch) {
+      setTouchStart(touch.clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    const touch = e.targetTouches[0];
+    if (touch) {
+      const currentY = touch.clientY;
+      if (currentY > touchStart) {
+        setTouchCurrent(currentY);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart === null || touchCurrent === null) return;
+    const diff = touchCurrent - touchStart;
+    if (diff > 100 && onCloseMobile) {
+      onCloseMobile();
+    }
+    setTouchStart(null);
+    setTouchCurrent(null);
+  };
+
+  const translateStyle = touchStart !== null && touchCurrent !== null && touchCurrent > touchStart
+    ? { transform: `translateY(${touchCurrent - touchStart}px)`, transition: 'none' }
+    : undefined;
+
   // Keep local state in sync when URL parameters change externally (e.g. Back button or chip delete)
   useEffect(() => {
     setQ(currentFilters.q || '');
@@ -95,6 +139,7 @@ export function FilterSidebar({ currentFilters, onApply, onReset }: FilterSideba
     if (includeInactive) filtersToApply.include_inactive = true;
 
     onApply(filtersToApply);
+    onCloseMobile?.();
   };
 
   const handleReset = () => {
@@ -109,14 +154,51 @@ export function FilterSidebar({ currentFilters, onApply, onReset }: FilterSideba
     setPriceReduced(false);
     setIncludeInactive(false);
     onReset();
+    onCloseMobile?.();
   };
 
   return (
-    <aside className="filter-sidebar">
-      <div className="filter-sidebar-header">
-        <SlidersHorizontal size={18} />
-        <span className="text-md">Filters</span>
-      </div>
+    <>
+      <div
+        className={`mobile-sheet-overlay ${isOpenMobile ? 'active' : ''}`}
+        onClick={onCloseMobile}
+        aria-hidden="true"
+      />
+      <aside 
+        className={`filter-sidebar ${isOpenMobile ? 'mobile-sheet-open' : ''}`}
+        style={translateStyle}
+      >
+        {/* Drag handle for mobile bottom sheet */}
+        <div
+          className="mobile-sheet-drag-area mobile-only"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{ width: '100%', height: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'grab', marginBottom: '-8px' }}
+        >
+          <div
+            className="mobile-sheet-handle"
+            style={{ width: '36px', height: '4px', backgroundColor: 'var(--color-border-strong)', borderRadius: '2px' }}
+          />
+        </div>
+
+        <div className="filter-sidebar-header flex justify-between items-center w-full" style={{ display: 'flex', width: '100%' }}>
+          <div className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <SlidersHorizontal size={18} />
+            <span className="text-md">Filters</span>
+          </div>
+          {onCloseMobile && (
+            <button
+              type="button"
+              className="mobile-sheet-close-btn mobile-only p-1 text-secondary hover:text-primary focus:outline-none"
+              onClick={onCloseMobile}
+              aria-label="Close filters"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}
+            >
+              <X size={20} />
+            </button>
+          )}
+        </div>
       <form onSubmit={handleSubmit} className="filter-form">
         <Input
           label="Search text"
@@ -212,5 +294,6 @@ export function FilterSidebar({ currentFilters, onApply, onReset }: FilterSideba
         </div>
       </form>
     </aside>
+  </>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { X, AlertCircle, Map as MapIcon, List as ListIcon } from 'lucide-react';
+import { X, AlertCircle, Map as MapIcon, List as ListIcon, SlidersHorizontal } from 'lucide-react';
 import { listings } from '../api';
 import useListingFilters from '../hooks/useListingFilters';
 import { FilterSidebar } from '../components/layout/FilterSidebar';
@@ -28,6 +28,7 @@ export default function Listings() {
   // Sync hover states between list cards and map markers
   const [hoveredListingId, setHoveredListingId] = useState<number | null>(null);
   const [selectedListingId, setSelectedListingId] = useState<number | null>(null);
+  const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
   // Infinite query for paginated listings
   const {
@@ -154,6 +155,8 @@ export default function Listings() {
           currentFilters={filters}
           onApply={handleApplyFilters}
           onReset={handleResetFilters}
+          isOpenMobile={showFiltersMobile}
+          onCloseMobile={() => setShowFiltersMobile(false)}
         />
 
         {/* Right Column: Search Results & Map splitting */}
@@ -189,7 +192,37 @@ export default function Listings() {
               )}
             </div>
 
-            <div className="results-header-actions">
+            <div className="results-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Button
+                variant="secondary"
+                onClick={() => setShowFiltersMobile(true)}
+                className="mobile-only"
+                style={{ height: '40px', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+              >
+                <SlidersHorizontal size={16} />
+                Filters
+                {activeChips.length > 0 && (
+                  <span 
+                    className="font-numeric" 
+                    style={{ 
+                      marginLeft: 'var(--space-1)', 
+                      padding: '2px 6px', 
+                      fontSize: '11px', 
+                      backgroundColor: 'var(--color-amber-400)', 
+                      color: 'var(--color-text-inverse)', 
+                      borderRadius: '50%', 
+                      fontWeight: 'bold',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '18px',
+                      height: '18px'
+                    }}
+                  >
+                    {activeChips.length}
+                  </span>
+                )}
+              </Button>
               <Select
                 value={filters.sort || 'newest'}
                 onChange={handleSortChange}

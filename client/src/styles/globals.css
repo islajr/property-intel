@@ -1642,3 +1642,79 @@ textarea:focus-visible {
   color: var(--color-text-primary);
   margin-bottom: var(--space-1);
 }
+
+/* ── Mobile Bottom Sheet Filter Sidebar ── */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.mobile-sheet-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-sheet-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(12, 15, 20, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 1050;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-normal) var(--ease-default);
+  }
+
+  .mobile-sheet-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .filter-sidebar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    background-color: var(--color-bg-overlay);
+    border-top: 1px solid var(--color-border-strong);
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 20px 20px 0 0;
+    z-index: 1060;
+    transform: translateY(100%);
+    transition: transform var(--duration-normal) var(--ease-default);
+    padding: var(--space-6);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  .filter-sidebar.mobile-sheet-open {
+    transform: translateY(0);
+    animation: slideUp var(--duration-normal) var(--ease-default);
+  }
+
+  .filter-sidebar:not(.mobile-sheet-open) {
+    display: none;
+  }
+
+  .filter-form {
+    padding-bottom: var(--space-8);
+  }
+
+  .mobile-hidden {
+    display: none !important;
+  }
+}
+
