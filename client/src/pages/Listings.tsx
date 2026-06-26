@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { listings } from '../api';
 import useListingFilters from '../hooks/useListingFilters';
 import { FilterSidebar } from '../components/layout/FilterSidebar';
 import ListingCard from '../components/listing/ListingCard';
+import MapView from '../components/listing/MapView';
 import Skeleton from '../components/primitives/Skeleton';
 import Button from '../components/primitives/Button';
 import Select from '../components/primitives/Select';
@@ -20,6 +22,12 @@ const SORT_OPTIONS = [
 export default function Listings() {
   const navigate = useNavigate();
   const { filters, setFilters, clearFilters } = useListingFilters();
+  
+  // Mobile view toggle state: 'list' or 'map'
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  // Sync hover states between list cards and map markers
+  const [hoveredListingId, setHoveredListingId] = useState<number | null>(null);
+  const [selectedListingId, setSelectedListingId] = useState<number | null>(null);
 
   // Infinite query for paginated listings
   const {
@@ -32,11 +40,13 @@ export default function Listings() {
     refetch,
   } = useInfiniteQuery({
     queryKey: ['listings', filters],
-    queryFn: ({ pageParam }) =>
-      listings.search({
-        ...filters,
-        cursor: pageParam,
-      }),
+    queryFn: ({ pageParam }) => {
+      const params: any = { ...filters };
+      if (pageParam !== undefined) {
+        params.cursor = pageParam;
+      }
+      return listings.search(params);
+    },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.meta.has_more ? lastPage.meta.next_cursor || undefined : undefined,
@@ -100,8 +110,44 @@ export default function Listings() {
     }
   };
 
+  // Sync scroll on map pin click
+  const handleMarkerClick = (id: number) => {
+    setSelectedListingId(id);
+    const cardElement = document.getElementById(`listing-card-${id}`);
+    if (cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Temporary flash highlight effect
+      cardElement.classList.add('flash-highlight');
+      setTimeout(() => {
+        cardElement.classList.remove('flash-highlight');
+      }, 2000);
+    }
+  };
+
   return (
     <div className="listings-page-container container">
+      {/* Mobile view toggle floating button */}
+      <div className="mobile-view-toggle mobile-only">
+        <Button
+          variant="primary"
+          onClick={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}
+          className="rounded-full shadow-lg flex items-center gap-2"
+          style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000 }}
+        >
+          {viewMode === 'list' ? (
+            <>
+              <MapIcon size={16} />
+              Show Map
+            </>
+          ) : (
+            <>
+              <ListIcon size={16} />
+              Show List
+            </>
+          )}
+        </Button>
+      </div>
+
       <div className="listings-layout">
         {/* Left Column: Sidebar Filters */}
         <FilterSidebar
@@ -110,12 +156,12 @@ export default function Listings() {
           onReset={handleResetFilters}
         />
 
-        {/* Right Column: Search Results */}
+        {/* Right Column: Search Results & Map splitting */}
         <div className="listings-results">
           {/* Results Header: Count, Chips, Sort and Toggle */}
-          <div className="results-header-container">
+          <div className="results-header-container flex flex-wrap justify-between items-center gap-4 mb-4">
             <div className="results-header-info">
-              <h1 className="results-count text-lg">
+              <h1 className="results-count text-lg font-bold">
                 {isLoading ? (
                   <Skeleton width={120} height={24} />
                 ) : (
@@ -123,20 +169,20 @@ export default function Listings() {
                 )}
               </h1>
               {activeChips.length > 0 && (
-                <div className="active-chips-container">
+                <div className="active-chips-container flex flex-wrap gap-2 mt-2">
                   {activeChips.map((chip) => (
-                    <span key={chip.key} className="filter-chip text-xs">
+                    <span key={chip.key} className="filter-chip text-xs bg-subtle border border-strong rounded px-2.5 py-1 flex items-center gap-1.5 font-numeric">
                       {chip.label}
                       <button
                         onClick={() => handleRemoveChip(chip.key)}
-                        className="chip-remove-btn"
+                        className="chip-remove-btn text-secondary hover:text-primary focus:outline-none"
                         aria-label={`Remove filter ${chip.label}`}
                       >
                         <X size={12} />
                       </button>
                     </span>
                   ))}
-                  <button onClick={clearFilters} className="clear-all-chips-btn text-xs text-amber">
+                  <button onClick={clearFilters} className="clear-all-chips-btn text-xs text-amber font-semibold hover:underline">
                     Clear all
                   </button>
                 </div>
@@ -153,9 +199,9 @@ export default function Listings() {
             </div>
           </div>
 
-          {/* Results Content */}
+          {/* Results Content Split Panes */}
           {isLoading ? (
-            <div className="listings-grid">
+            <div className="listings-grid grid">
               {Array(6)
                 .fill(0)
                 .map((_, i) => (
@@ -166,7 +212,7 @@ export default function Listings() {
             <div className="error-banner">
               <AlertCircle size={20} className="text-secondary" />
               <div>
-                <p className="text-md">Unable to connect</p>
+                <p className="text-md font-semibold">Unable to connect</p>
                 <p className="text-sm text-secondary">
                   Unable to load property listings. Check your internet connection and try again.
                 </p>
@@ -176,12 +222,12 @@ export default function Listings() {
               </div>
             </div>
           ) : allListings.length === 0 ? (
-            <div className="listings-empty-state">
-              <span className="empty-state-icon text-tertiary" aria-hidden="true">
+            <div className="listings-empty-state text-center py-16 bg-raised border border-default border-dashed rounded-lg">
+              <span className="empty-state-icon text-tertiary text-2xl" aria-hidden="true">
                 🔍
               </span>
-              <p className="text-md">No listings match your filters</p>
-              <p className="text-sm text-secondary">
+              <p className="text-md font-bold text-primary mt-4">No listings match your filters</p>
+              <p className="text-sm text-secondary max-w-xs mx-auto mt-2">
                 Try adjusting your search criteria or clearing some filters to find matches.
               </p>
               <Button variant="primary" onClick={clearFilters} style={{ marginTop: 'var(--space-4)' }}>
@@ -189,31 +235,67 @@ export default function Listings() {
               </Button>
             </div>
           ) : (
-            <>
-              <div className="listings-grid">
-                {allListings.map((listing) => (
-                  <ListingCard
-                    key={listing.id}
-                    listing={listing}
-                    onClick={() => navigate(`/listings/${listing.id}`)}
-                  />
-                ))}
+            <div className="listings-split-pane-layout">
+              {/* Left Pane: List Grid */}
+              <div 
+                className={`listings-list-pane flex-1 ${viewMode === 'map' ? 'mobile-hidden' : ''}`}
+              >
+                <div className="listings-grid grid">
+                  {allListings.map((listing) => (
+                    <div 
+                      key={listing.id}
+                      id={`listing-card-${listing.id}`}
+                      className={`listing-card-interactive-wrapper transition-all duration-200 ${
+                        selectedListingId === listing.id ? 'card-selected-highlight' : ''
+                      }`}
+                      onMouseEnter={() => setHoveredListingId(listing.id)}
+                      onMouseLeave={() => setHoveredListingId(null)}
+                    >
+                      <ListingCard
+                        listing={listing}
+                        onClick={() => navigate(`/listings/${listing.id}`)}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Load More Pagination */}
+                {hasNextPage && (
+                  <div className="pagination-container text-center mt-6">
+                    <Button
+                      variant="secondary"
+                      onClick={() => fetchNextPage()}
+                      isLoading={isFetchingNextPage}
+                      className="load-more-btn"
+                    >
+                      Load More
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              {/* Load More Pagination */}
-              {hasNextPage && (
-                <div className="pagination-container">
-                  <Button
-                    variant="secondary"
-                    onClick={() => fetchNextPage()}
-                    isLoading={isFetchingNextPage}
-                    className="load-more-btn"
-                  >
-                    Load More
-                  </Button>
-                </div>
-              )}
-            </>
+              {/* Right Pane: Map */}
+              <div 
+                className={`listings-map-pane ${viewMode === 'list' ? 'mobile-hidden' : ''}`}
+                style={{ 
+                  flex: '1.2', 
+                  minHeight: '400px', 
+                  height: 'calc(100vh - 220px)', 
+                  position: 'sticky', 
+                  top: '100px', 
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  border: '1px solid var(--color-border)'
+                }}
+              >
+                <MapView
+                  listings={allListings}
+                  activeListingId={hoveredListingId}
+                  onMarkerHover={setHoveredListingId}
+                  onMarkerClick={handleMarkerClick}
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>
