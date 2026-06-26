@@ -3,10 +3,12 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { Menu, X, Bell, LogOut } from 'lucide-react';
 import { logout } from '../../api/auth';
+import { useToast } from '../toast/ToastProvider';
 
 export default function Navigation() {
   const { isAuthenticated, clearToken } = useAuthStore();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -42,6 +44,7 @@ export default function Navigation() {
     }
     clearToken();
     setDropdownOpen(false);
+    addToast('Signed out', 'success');
     navigate('/');
   };
 

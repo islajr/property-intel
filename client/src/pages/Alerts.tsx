@@ -6,9 +6,11 @@ import AlertForm from '../components/alerts/AlertForm';
 import Button from '../components/primitives/Button';
 import Skeleton from '../components/primitives/Skeleton';
 import { Bell, Plus, AlertCircle } from 'lucide-react';
+import { useToast } from '../components/toast/ToastProvider';
 
 export default function Alerts() {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // 1. Fetch user alerts list
@@ -23,7 +25,12 @@ export default function Alerts() {
     onSuccess: () => {
       // Invalidate query to refresh list
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
+      addToast('Alert deleted', 'success');
     },
+    onError: (err: any) => {
+      const msg = err.response?.data?.message || 'Failed to delete alert. Please try again.';
+      addToast('Unable to delete alert', 'error', msg);
+    }
   });
 
   const handleDeleteAlert = async (id: number) => {
@@ -33,6 +40,7 @@ export default function Alerts() {
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
     queryClient.invalidateQueries({ queryKey: ['alerts'] });
+    addToast('Alert created', 'success');
   };
 
   return (

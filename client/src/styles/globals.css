@@ -1763,3 +1763,16 @@ textarea:focus-visible {
 .listings-grid > *:nth-child(11) { animation-delay: 400ms; }
 .listings-grid > *:nth-child(12) { animation-delay: 440ms; }
 
+/* ── Toast Animation ── */
+@keyframes slideInToast {
+  from {
+    transform: translateY(100%) translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+

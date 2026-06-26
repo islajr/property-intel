@@ -6,11 +6,13 @@ import AuthForm from '../components/auth/AuthForm';
 import Input from '../components/primitives/Input';
 import Button from '../components/primitives/Button';
 import { AlertCircle } from 'lucide-react';
+import { useToast } from '../components/toast/ToastProvider';
 
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setToken } = useAuthStore();
+  const { addToast } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,10 +34,12 @@ export default function Login() {
     try {
       const res = await login({ email, password });
       setToken(res.accessToken, res.expiresIn);
+      addToast('Signed in', 'success');
       navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Invalid email or password. Please try again.';
       setError(msg);
+      addToast('Unable to sign in', 'error', msg);
     } finally {
       setLoading(false);
     }

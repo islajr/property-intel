@@ -6,11 +6,13 @@ import AuthForm from '../components/auth/AuthForm';
 import Input from '../components/primitives/Input';
 import Button from '../components/primitives/Button';
 import { AlertCircle } from 'lucide-react';
+import { useToast } from '../components/toast/ToastProvider';
 
 export default function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setToken } = useAuthStore();
+  const { addToast } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,10 +40,12 @@ export default function Register() {
     try {
       const res = await register({ email, password });
       setToken(res.accessToken, res.expiresIn);
+      addToast('Account created', 'success');
       navigate(redirectTarget, { replace: true });
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.';
       setError(msg);
+      addToast('Registration failed', 'error', msg);
     } finally {
       setLoading(false);
     }
