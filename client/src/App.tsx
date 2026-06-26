@@ -1,4 +1,7 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import { refresh } from './api/auth';
 import PageShell from './components/layout/PageShell';
 import Home from './pages/Home';
 import Listings from './pages/Listings';
@@ -11,6 +14,34 @@ import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 
 function App() {
+  const { setToken, clearToken } = useAuthStore();
+  const [initializing, setInitializing] = useState(true);
+
+  useEffect(() => {
+    const attemptRefresh = async () => {
+      try {
+        const res = await refresh();
+        setToken(res.accessToken, res.expiresIn);
+      } catch (error) {
+        clearToken();
+      } finally {
+        setInitializing(false);
+      }
+    };
+    attemptRefresh();
+  }, [setToken, clearToken]);
+
+  if (initializing) {
+    return (
+      <div 
+        className="fullscreen-loader font-numeric text-xs text-secondary flex items-center justify-center"
+        style={{ minHeight: '100vh', background: 'var(--color-bg-base)' }}
+      >
+        INITIALIZING SESSION...
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
