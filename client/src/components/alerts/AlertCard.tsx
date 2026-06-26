@@ -18,7 +18,7 @@ const formatPropertyType = (type: string | null | undefined): string => {
 export default function AlertCard({ alert, onDelete }: AlertCardProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clear timeout on unmount
   useEffect(() => {
@@ -29,6 +29,11 @@ export default function AlertCard({ alert, onDelete }: AlertCardProps) {
     };
   }, []);
 
+  /**
+   * Triggers the alert deletion flow. Clicking once activates a 3-second inline
+   * confirmation state ("CONFIRM DELETE?"). Clicking again within 3 seconds executes
+   * the deletion; otherwise, the state resets back to "DELETE".
+   */
   const handleDeleteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     

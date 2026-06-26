@@ -5,7 +5,7 @@ import type { PropertyType } from '../../types/api';
 import Input from '../primitives/Input';
 import Select from '../primitives/Select';
 import Button from '../primitives/Button';
-import { PlusCircle, RotateCcw } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 
 export interface AlertFormProps {
   onSuccess: () => void;
