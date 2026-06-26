@@ -1,7 +1,16 @@
 import axios from 'axios';
 import { authStore } from '../store/authStore';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://property-intel.up.railway.app/api/v1';
+const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (!envUrl) {
+    return 'https://property-intel.up.railway.app/api/v1';
+  }
+  const cleanUrl = envUrl.trim().replace(/\/$/, '');
+  return cleanUrl.endsWith('/api/v1') ? cleanUrl : `${cleanUrl}/api/v1`;
+};
+
+const BASE_URL = getApiBaseUrl();
 
 export const client = axios.create({
   baseURL: BASE_URL,
