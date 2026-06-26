@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'neutral' | 'amber' | 'signal-up' | 'signal-down' | 'dom-fresh' | 'dom-active' | 'dom-stale';

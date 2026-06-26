@@ -57,14 +57,14 @@ export interface NeighbourhoodStatsResponse {
   medianPriceKobo: number;
   formattedMedianPrice: string;
   activeListingCount: number;
-  avgDaysOnMarket: number | null;
+  avgDaysOnMarket: number | null | undefined;
   newListingsCount: number;
   priceReducedCount: number;
   pricePercentiles: MarketPercentiles;
   vsLastWeek: {
     medianPriceChangePct: number | null;
     daysOnMarketChangePct: number | null;
-  } | null;
+  } | null | undefined;
 }
 
 export interface TrendWeek {
@@ -102,18 +102,18 @@ export interface Alert {
   id: number;
   userId: number;
   neighbourhood: string;
-  maxPriceKobo: number | null;
-  minBedrooms: number | null;
-  propertyType: PropertyType | null;
+  maxPriceKobo: number | null | undefined;
+  minBedrooms: number | null | undefined;
+  propertyType: PropertyType | null | undefined;
   createdAt: string;              // ISO 8601 timestamp
   isActive: boolean;
 }
 
 export interface AlertRequest {
   neighbourhood: string;
-  maxPriceKobo: number | null;
-  minBedrooms: number | null;
-  propertyType: PropertyType | null;
+  maxPriceKobo: number | null | undefined;
+  minBedrooms: number | null | undefined;
+  propertyType: PropertyType | null | undefined;
 }
 
 export interface AuthResponse {
@@ -138,17 +138,17 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ListingSearchParams {
-  q?: string;
-  neighbourhood?: string;
-  type?: PropertyType;
-  min_beds?: number;
-  max_beds?: number;
-  min_price?: number;            // in kobo
-  max_price?: number;            // in kobo
-  max_days?: number;
-  price_reduced?: boolean;
-  sort?: 'price_asc' | 'price_desc' | 'newest' | 'days_asc';
-  cursor?: string;
-  limit?: number;
-  include_inactive?: boolean;
+  q?: string | undefined;
+  neighbourhood?: string | undefined;
+  type?: PropertyType | undefined;
+  min_beds?: number | undefined;
+  max_beds?: number | undefined;
+  min_price?: number | undefined;            // in kobo
+  max_price?: number | undefined;            // in kobo
+  max_days?: number | undefined;
+  price_reduced?: boolean | undefined;
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'days_asc' | undefined;
+  cursor?: string | undefined;
+  limit?: number | undefined;
+  include_inactive?: boolean | undefined;
 }

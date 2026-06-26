@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { Menu, X, Bell, LogOut } from 'lucide-react';
 
 export default function Navigation() {
-  const { isAuthenticated, clearToken, accessToken } = useAuthStore();
+  const { isAuthenticated, clearToken } = useAuthStore();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);

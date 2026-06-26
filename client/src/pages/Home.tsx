@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search, ArrowRight, TrendingDown, Clock, BarChart3 } from 'lucide-react';
+import { Search, ArrowRight, TrendingDown, Clock } from 'lucide-react';
 import { listings, market } from '../api';
 import ListingCard from '../components/listing/ListingCard';
 import Skeleton from '../components/primitives/Skeleton';

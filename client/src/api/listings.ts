@@ -1,5 +1,5 @@
 import client from './client';
-import { ListingData, ListingDetailResponse, ListingSearchParams, PaginatedResponse } from '../types/api';
+import type { ListingData, ListingDetailResponse, ListingSearchParams, PaginatedResponse } from '../types/api';
 
 export const search = async (params: ListingSearchParams): Promise<PaginatedResponse<ListingData>> => {
   const response = await client.get<PaginatedResponse<ListingData>>('/listings', { params });

@@ -1,5 +1,5 @@
 import client from './client';
-import { NeighbourhoodSummary, NeighbourhoodStatsResponse, NeighbourhoodTrendResponse } from '../types/api';
+import type { NeighbourhoodSummary, NeighbourhoodStatsResponse, NeighbourhoodTrendResponse } from '../types/api';
 
 export interface NeighbourhoodSearchParams {
   sort_by?: 'neighbourhood' | 'new_listings' | 'price_reduced' | 'median_price' | 'active_listings';

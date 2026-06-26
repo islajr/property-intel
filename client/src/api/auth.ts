@@ -1,5 +1,5 @@
 import client from './client';
-import { AuthResponse } from '../types/api';
+import type { AuthResponse } from '../types/api';
 
 export const login = async (body: Record<string, string>): Promise<AuthResponse> => {
   const response = await client.post<AuthResponse>('/auth/login', body);

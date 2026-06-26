@@ -1,5 +1,5 @@
 import { ExternalLink, BedDouble, Bath, Clock } from 'lucide-react';
-import { ListingData, ListingDetailResponse } from '../../types/api';
+import type { ListingData, ListingDetailResponse } from '../../types/api';
 import Badge from '../primitives/Badge';
 
 export interface ListingCardProps {

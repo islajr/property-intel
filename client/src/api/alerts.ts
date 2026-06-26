@@ -1,5 +1,5 @@
 import client from './client';
-import { Alert, AlertRequest } from '../types/api';
+import type { Alert, AlertRequest } from '../types/api';
 
 export const list = async (): Promise<Alert[]> => {
   const response = await client.get<Alert[]>('/alerts');
