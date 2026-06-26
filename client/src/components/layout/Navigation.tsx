@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { Menu, X, Bell, LogOut } from 'lucide-react';
+import { logout } from '../../api/auth';
 
 export default function Navigation() {
   const { isAuthenticated, clearToken } = useAuthStore();
@@ -9,14 +10,36 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Helper to extract email/avatar info (in memory only)
-  // For now, since we store only the token in-memory, we can show a placeholder "U" or parse the token if JWT is present
   const getUserInitial = () => {
+    const token = useAuthStore.getState().accessToken;
+    if (!token) return 'U';
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3 && parts[1]) {
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          window.atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        const payload = JSON.parse(jsonPayload);
+        const email = payload.sub || payload.email || 'U';
+        return email.charAt(0).toUpperCase();
+      }
+    } catch (e) {
+      // fallback
+    }
     return 'U';
   };
 
-  const handleSignOut = () => {
-    // Call clearToken and navigate
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      // Allow local logout if API fails
+    }
     clearToken();
     setDropdownOpen(false);
     navigate('/');
