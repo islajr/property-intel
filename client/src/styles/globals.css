@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── Backgrounds ── */
+  --color-bg-base:      #0C0F14;   /* Page background — deep ink */
+  --color-bg-raised:    #13171F;   /* Card background — 1dp lift */
+  --color-bg-overlay:   #1A202C;   /* Modals, popovers — 2dp lift */
+  --color-bg-subtle:    #1E2433;   /* Table zebra rows, input backgrounds */
+
+  /* ── Borders ── */
+  --color-border:       #252D3D;   /* Default divider */
+  --color-border-strong:#3A4559;   /* Focused states, active selection */
+
+  /* ── Text ── */
+  --color-text-primary:  #F0F2F5;  /* Body text, headings */
+  --color-text-secondary:#8B95A9;  /* Labels, metadata, captions */
+  --color-text-tertiary: #5C6880;  /* Placeholder text, disabled */
+  --color-text-inverse:  #0C0F14;  /* Text on amber backgrounds */
+
+  /* ── Amber — Primary Accent ── */
+  --color-amber-100: #FFF8E7;
+  --color-amber-300: #FFD166;
+  --color-amber-400: #F5B942;      /* Primary interactive state */
+  --color-amber-500: #E6A820;      /* Hover state */
+  --color-amber-600: #C78F0A;      /* Pressed state */
+
+  /* ── Semantic — Market Signals ── */
+  --color-signal-up:      #34D399;  /* Price increase — emerald */
+  --color-signal-down:    #F87171;  /* Price drop — rose */
+  --color-signal-neutral: #8B95A9;  /* No change */
+
+  /* ── Days-on-Market Traffic Light ── */
+  --color-dom-fresh:    #34D399;   /* < 14 days */
+  --color-dom-active:   #FBBF24;   /* 14–45 days */
+  --color-dom-stale:    #F87171;   /* > 45 days */
+
+  /* ── Focus Ring ── */
+  --color-focus:        rgba(245, 185, 66, 0.4);
+
+  /* ── Typography ── */
+  --font-ui:      'Inter', -apple-system, sans-serif;
+  --font-numeric: 'DM Mono', 'Fira Code', monospace;
+
+  /* ── Spacing ── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ── Typography Scale ── */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   26px;
+  --text-2xl:  34px;
+  --text-3xl:  48px;
+
+  /* ── Motion & Animation ── */
+  --duration-instant:  80ms;    /* Micro-interactions: icon press, checkbox */
+  --duration-fast:    150ms;    /* Button feedback, hover state changes */
+  --duration-normal:  250ms;    /* Card appearance, filter panel open */
+  --duration-slow:    400ms;    /* Page transitions, chart animations */
+
+  --ease-default:     cubic-bezier(0.2, 0.0, 0.0, 1.0);   /* Decelerate — things arriving */
+  --ease-out-back:    cubic-bezier(0.34, 1.56, 0.64, 1);  /* Slight overshoot — confirmation */
+  --ease-in-out:      cubic-bezier(0.4, 0.0, 0.2, 1.0);   /* Symmetric transitions */
+}
+
+/* ── Resets & Base Styles ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-default), opacity var(--duration-fast) var(--ease-default);
+}
+
+a:hover {
+  color: var(--color-amber-400);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+  border-color: var(--color-amber-400);
+}
+
+/* ── Typography Utilities ── */
+.text-xs { font-size: var(--text-xs); line-height: 16px; }
+.text-sm { font-size: var(--text-sm); line-height: 20px; }
+.text-base { font-size: var(--text-base); line-height: 24px; }
+.text-md { font-size: var(--text-md); line-height: 26px; font-weight: 500; }
+.text-lg { font-size: var(--text-lg); line-height: 30px; font-weight: 600; }
+.text-xl { font-size: var(--text-xl); line-height: 36px; font-weight: 700; }
+.text-2xl { font-size: var(--text-2xl); line-height: 44px; font-weight: 700; }
+.text-3xl { font-size: var(--text-3xl); line-height: 58px; font-weight: 700; }
+
+.font-numeric {
+  font-family: var(--font-numeric);
+}
+
+/* ── Layout & Containers ── */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+  }
+}
+
+/* ── Dark Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* ── Truncation Helper ── */
+.truncate-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Screen Reader Only Utilities ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Prefers Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
