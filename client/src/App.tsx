@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import PageShell from './components/layout/PageShell';
 import Home from './pages/Home';
 import Listings from './pages/Listings';
 import ListingDetail from './pages/ListingDetail';
@@ -13,12 +14,17 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/listings" element={<Listings />} />
-        <Route path="/listings/:id" element={<ListingDetail />} />
-        <Route path="/market" element={<Market />} />
-        <Route path="/market/:name" element={<Neighbourhood />} />
-        <Route path="/alerts" element={<Alerts />} />
+        {/* Pages wrapped with Navigation Top Bar and Footer */}
+        <Route element={<PageShell />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/listings" element={<Listings />} />
+          <Route path="/listings/:id" element={<ListingDetail />} />
+          <Route path="/market" element={<Market />} />
+          <Route path="/market/:name" element={<Neighbourhood />} />
+          <Route path="/alerts" element={<Alerts />} />
+        </Route>
+
+        {/* Standalone pages */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
