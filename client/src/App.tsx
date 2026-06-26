@@ -12,6 +12,7 @@ import Alerts from './pages/Alerts';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   const { setToken, clearToken } = useAuthStore();
@@ -52,7 +53,10 @@ function App() {
           <Route path="/listings/:id" element={<ListingDetail />} />
           <Route path="/market" element={<Market />} />
           <Route path="/market/:name" element={<Neighbourhood />} />
-          <Route path="/alerts" element={<Alerts />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/alerts" element={<Alerts />} />
+          </Route>
         </Route>
 
         {/* Standalone pages */}
