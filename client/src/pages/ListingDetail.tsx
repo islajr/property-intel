@@ -245,14 +245,16 @@ export default function ListingDetail() {
           />
 
           {/* Minimap (280px tall, centred on coordinates, no controls) */}
-          <div className="detail-map-card bg-raised border border-default rounded-lg overflow-hidden mb-6" style={{ height: 280 }}>
-            <MapView
-              listings={[listing]}
-              center={[listing.lat, listing.lng]}
-              zoom={14}
-              interactive={false}
-            />
-          </div>
+          {listing.lat !== null && listing.lng !== null && (
+            <div className="detail-map-card bg-raised border border-default rounded-lg overflow-hidden mb-6" style={{ height: 280 }}>
+              <MapView
+                listings={[listing]}
+                center={[listing.lat, listing.lng]}
+                zoom={14}
+                interactive={false}
+              />
+            </div>
+          )}
 
           {/* Brokerage/source overview */}
           <div className="detail-brokerage-card bg-raised border border-default rounded-lg p-6 mb-6">

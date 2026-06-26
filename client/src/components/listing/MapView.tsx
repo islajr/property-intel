@@ -70,6 +70,18 @@ export default function MapView({
   interactive = true,
 }: MapViewProps) {
   
+  const validListings = useMemo(() => {
+    return listings.filter(
+      (l) =>
+        l.lat !== null &&
+        l.lng !== null &&
+        typeof l.lat === 'number' &&
+        typeof l.lng === 'number' &&
+        !isNaN(l.lat) &&
+        !isNaN(l.lng)
+    );
+  }, [listings]);
+
   const activeIcon = useMemo(() => createAmberIcon(true), []);
   const defaultIcon = useMemo(() => createAmberIcon(false), []);
 
@@ -91,7 +103,7 @@ export default function MapView({
         />
 
         {/* Recenter bounds on listings changes */}
-        {listings.length > 0 && <RecenterMap listings={listings} />}
+        {validListings.length > 0 && <RecenterMap listings={validListings} />}
 
         <MarkerClusterGroup
           chunkedLoading
@@ -105,13 +117,13 @@ export default function MapView({
             });
           }}
         >
-          {listings.map((item) => {
+          {validListings.map((item) => {
             const isActive = item.id === activeListingId;
             
             return (
               <Marker
                 key={item.id}
-                position={[item.lat, item.lng]}
+                position={[item.lat!, item.lng!]}
                 icon={isActive ? activeIcon : defaultIcon}
                 eventHandlers={{
                   mouseover: () => {
