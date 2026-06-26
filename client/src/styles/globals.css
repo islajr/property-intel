@@ -913,3 +913,142 @@ textarea:focus-visible {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
+
+/* ── ListingCard Component Styles ── */
+.listing-card {
+  background-color: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: border-color var(--duration-fast) var(--ease-default),
+              transform var(--duration-fast) var(--ease-default);
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+}
+
+.listing-card:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+.listing-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+  border-color: var(--color-amber-400);
+}
+
+.listing-card:active {
+  transform: translateY(0);
+  border-color: var(--color-amber-400);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.card-header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.property-type-tag {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.card-header-divider {
+  color: var(--color-text-tertiary);
+}
+
+.neighbourhood-tag {
+  max-width: 140px;
+}
+
+.card-specs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spec-divider {
+  color: var(--color-text-tertiary);
+}
+
+.card-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.card-price {
+  font-size: var(--text-2xl);
+  color: var(--color-amber-400);
+  font-weight: 700;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+  margin-top: auto;
+  width: 100%;
+}
+
+.card-dom-container {
+  display: flex;
+  align-items: center;
+}
+
+.dom-badge-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.card-source-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.source-label {
+  color: var(--color-text-secondary);
+}
+
+.external-source-link {
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.external-source-link:hover {
+  color: var(--color-amber-400);
+}
+
+.text-tertiary {
+  color: var(--color-text-tertiary) !important;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary) !important;
+}
