@@ -65,20 +65,34 @@ export default function ListingDetail() {
     );
   }
 
-  if (isError || !listing) {
+  if (isError) {
+    return (
+      <div className="listing-detail-container container py-12 text-center">
+        <h2 className="text-lg font-semibold mb-2">Unable to connect</h2>
+        <p className="text-secondary mb-6">We encountered an error loading the listing details. Check your internet connection and try again.</p>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'center', alignItems: 'center' }}>
+          <Button variant="primary" onClick={() => refetch()}>
+            Retry
+          </Button>
+          <Link to="/listings">
+            <Button variant="secondary">Back to Listings</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!listing) {
     return (
       <div className="listing-detail-container container py-12 text-center">
         <h2 className="text-lg font-semibold mb-2">Listing not found</h2>
-        <p className="text-secondary mb-6">The property listing you are looking for does not exist or has been removed.</p>
+        <p className="text-secondary mb-6">The property listing you are looking for does not exist or has been removed. Check the URL or try searching again.</p>
         <Link to="/listings" className="inline-block">
           <Button variant="primary">
-            <ArrowLeft size={16} className="mr-2" />
+            <ArrowLeft size={16} style={{ marginRight: 'var(--space-2)' }} />
             Back to Listings
           </Button>
         </Link>
-        <Button variant="secondary" onClick={() => refetch()} style={{ marginLeft: 'var(--space-2)' }}>
-          Retry
-        </Button>
       </div>
     );
   }

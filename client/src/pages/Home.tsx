@@ -1,30 +1,31 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search, ArrowRight, TrendingDown, Clock } from 'lucide-react';
+import { Search, ArrowRight, TrendingDown, Clock, AlertCircle } from 'lucide-react';
 import { listings, market } from '../api';
 import ListingCard from '../components/listing/ListingCard';
 import Skeleton from '../components/primitives/Skeleton';
 import Badge from '../components/primitives/Badge';
+import Button from '../components/primitives/Button';
 
 export default function Home() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch recent listings
-  const { data: recentData, isLoading: recentLoading } = useQuery({
+  const { data: recentData, isLoading: recentLoading, isError: recentError, refetch: refetchRecent } = useQuery({
     queryKey: ['listings', 'recent'],
     queryFn: () => listings.search({ sort: 'newest', limit: 6 }),
   });
 
   // Fetch neighbourhoods
-  const { data: neighbourhoodsData, isLoading: neighbourhoodsLoading } = useQuery({
+  const { data: neighbourhoodsData, isLoading: neighbourhoodsLoading, isError: neighbourhoodsError, refetch: refetchNeighbourhoods } = useQuery({
     queryKey: ['market', 'neighbourhoods'],
     queryFn: () => market.getNeighbourhoods({ limit: 50 }),
   });
 
   // Fetch market overview stats (defaults to Ajah / general Lagos benchmark)
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { data: statsData, isLoading: statsLoading, isError: statsError, refetch: refetchStats } = useQuery({
     queryKey: ['market', 'stats', 'Ajah'],
     queryFn: () => market.getStats('Ajah'),
   });
@@ -94,6 +95,19 @@ export default function Home() {
               <Skeleton height={100} borderRadius={12} />
               <Skeleton height={100} borderRadius={12} />
             </>
+          ) : statsError ? (
+            <div className="error-banner" style={{ gridColumn: '1 / -1' }}>
+              <AlertCircle size={20} className="text-secondary" />
+              <div>
+                <p className="text-md font-semibold">Unable to connect</p>
+                <p className="text-sm text-secondary">
+                  Unable to load market stats. Check your internet connection and try again.
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => refetchStats()} style={{ marginTop: 'var(--space-2)' }}>
+                  Retry
+                </Button>
+              </div>
+            </div>
           ) : (
             <>
               {/* Tile 1: Median Price */}
@@ -188,6 +202,19 @@ export default function Home() {
             Array(6)
               .fill(0)
               .map((_, i) => <Skeleton key={i} height={120} borderRadius={12} />)
+          ) : neighbourhoodsError ? (
+            <div className="error-banner" style={{ gridColumn: '1 / -1' }}>
+              <AlertCircle size={20} className="text-secondary" />
+              <div>
+                <p className="text-md font-semibold">Unable to connect</p>
+                <p className="text-sm text-secondary">
+                  Unable to load trending markets. Check your internet connection and try again.
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => refetchNeighbourhoods()} style={{ marginTop: 'var(--space-2)' }}>
+                  Retry
+                </Button>
+              </div>
+            </div>
           ) : (
             trendingNeighbourhoods.map((n) => (
               <Link 
@@ -231,8 +258,31 @@ export default function Home() {
             Array(6)
               .fill(0)
               .map((_, i) => <Skeleton key={i} height={200} borderRadius={12} />)
+          ) : recentError ? (
+            <div className="error-banner" style={{ gridColumn: '1 / -1' }}>
+              <AlertCircle size={20} className="text-secondary" />
+              <div>
+                <p className="text-md font-semibold">Unable to connect</p>
+                <p className="text-sm text-secondary">
+                  Unable to load recent listings. Check your internet connection and try again.
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => refetchRecent()} style={{ marginTop: 'var(--space-2)' }}>
+                  Retry
+                </Button>
+              </div>
+            </div>
+          ) : !recentData || recentData.data.length === 0 ? (
+            <div className="listings-empty-state text-center py-16 bg-raised border border-default border-dashed rounded-lg" style={{ gridColumn: '1 / -1' }}>
+              <span className="empty-state-icon text-tertiary text-2xl" aria-hidden="true">
+                🔍
+              </span>
+              <p className="text-md font-bold text-primary mt-4">No recent listings available</p>
+              <p className="text-sm text-secondary max-w-xs mx-auto mt-2">
+                No active properties are indexed currently. Please check again later.
+              </p>
+            </div>
           ) : (
-            recentData?.data.map((listing) => (
+            recentData.data.map((listing) => (
               <ListingCard
                 key={listing.id}
                 listing={listing}

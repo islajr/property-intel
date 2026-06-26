@@ -214,8 +214,17 @@ export default function Neighbourhood() {
         </h2>
 
         {allListings.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-default rounded-lg">
-            <p className="text-sm text-secondary">No active properties indexed for this neighbourhood currently.</p>
+          <div className="alerts-empty-state text-center py-16 bg-raised border border-default border-dashed rounded-lg p-8">
+            <div className="inline-flex items-center justify-center p-3 rounded-full bg-subtle text-amber mb-4 border border-strong">
+              <AlertCircle size={24} />
+            </div>
+            <h3 className="text-md font-bold text-primary mb-1">No listings found</h3>
+            <p className="text-sm text-secondary max-w-sm mx-auto mb-6">
+              No active properties are indexed for this neighbourhood currently. Try checking another neighbourhood or browsing all listings.
+            </p>
+            <Link to="/listings">
+              <Button variant="primary">Browse All Listings</Button>
+            </Link>
           </div>
         ) : (
           <>
