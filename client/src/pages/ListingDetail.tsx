@@ -6,6 +6,7 @@ import PriceHistoryTimeline from '../components/listing/PriceHistoryTimeline';
 import PriceHistoryChart from '../components/listing/PriceHistoryChart';
 import { NeighbourhoodContextCard } from '../components/listing/NeighbourhoodContextCard';
 import { NearbyListings } from '../components/listing/NearbyListings';
+import MapView from '../components/listing/MapView';
 import Badge from '../components/primitives/Badge';
 import Skeleton from '../components/primitives/Skeleton';
 import Button from '../components/primitives/Button';
@@ -228,6 +229,16 @@ export default function ListingDetail() {
             neighbourhood={listing.neighbourhood}
             listingPrice={listing.priceKobo}
           />
+
+          {/* Minimap (280px tall, centred on coordinates, no controls) */}
+          <div className="detail-map-card bg-raised border border-default rounded-lg overflow-hidden mb-6" style={{ height: 280 }}>
+            <MapView
+              listings={[listing]}
+              center={[listing.lat, listing.lng]}
+              zoom={14}
+              interactive={false}
+            />
+          </div>
 
           {/* Brokerage/source overview */}
           <div className="detail-brokerage-card bg-raised border border-default rounded-lg p-6 mb-6">
