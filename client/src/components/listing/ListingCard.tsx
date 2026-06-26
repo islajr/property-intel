@@ -115,8 +115,21 @@ export function ListingCard({ listing, daysOnMarket, onClick }: ListingCardProps
     return <span className="font-numeric">{val} {suffix}</span>;
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <article className="listing-card" onClick={onClick}>
+    <article 
+      className="listing-card" 
+      onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
+      onKeyDown={onClick ? handleKeyDown : undefined}
+    >
       <header className="card-header">
         <div className="card-header-meta">
           <span className="property-type-tag">

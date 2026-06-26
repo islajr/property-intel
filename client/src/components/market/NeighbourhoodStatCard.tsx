@@ -85,10 +85,20 @@ export function NeighbourhoodStatCard({ name, city, initialStats }: Neighbourhoo
     return <Badge variant="neutral" size="compact">0.0%</Badge>;
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleCardClick();
+    }
+  };
+
   return (
     <article 
       className="neighbourhood-stat-card bg-raised border border-default hover:border-strong rounded-lg p-6 cursor-pointer transition-all flex flex-col justify-between"
       onClick={handleCardClick}
+      tabIndex={0}
+      role="button"
+      onKeyDown={handleKeyDown}
     >
       <div>
         <header className="flex justify-between items-start mb-2">
