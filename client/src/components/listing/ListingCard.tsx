@@ -1,6 +1,7 @@
 import { ExternalLink, BedDouble, Bath, Clock } from 'lucide-react';
 import type { ListingData, ListingDetailResponse } from '../../types/api';
 import Badge from '../primitives/Badge';
+import { formatNairaShort } from '../../utils/format';
 
 export interface ListingCardProps {
   listing: ListingData | ListingDetailResponse;
@@ -63,6 +64,45 @@ export function ListingCard({ listing, daysOnMarket, onClick }: ListingCardProps
     return 'Stale';
   };
 
+  // Parse price signal if history is available
+  const getPriceSignal = () => {
+    if (!('listingHistory' in listing) || !listing.listingHistory) return null;
+    
+    const priceChanges = listing.listingHistory.filter(
+      (e) => e.eventType === 'PRICE_CHANGE'
+    );
+    
+    if (priceChanges.length === 0) return null;
+    
+    // Most recent first
+    const sortedChanges = [...priceChanges].sort(
+      (a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()
+    );
+    
+    const latestChange = sortedChanges[0];
+    if (!latestChange || latestChange.oldValue === null || latestChange.newValue === null) return null;
+    
+    const diff = latestChange.newValue - latestChange.oldValue;
+    if (diff === 0) return null;
+    
+    const diffAbs = Math.abs(diff);
+    const pct = Math.round((diffAbs / latestChange.oldValue) * 100);
+    
+    const changeDate = new Date(latestChange.eventDate);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - changeDate.getTime());
+    const daysSince = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return {
+      isDrop: diff < 0,
+      amount: diffAbs,
+      percent: pct,
+      daysSince,
+    };
+  };
+
+  const priceSignal = getPriceSignal();
+
   // Safe spec display (use em-dash on null/missing values)
   const renderSpec = (val: number | null | undefined, suffix: string) => {
     if (val === null || val === undefined) {
@@ -112,6 +152,14 @@ export function ListingCard({ listing, daysOnMarket, onClick }: ListingCardProps
         <h3 className="card-price font-numeric">
           {listing.priceFormatted}
         </h3>
+        {priceSignal && (
+          <div className={`price-signal-container ${priceSignal.isDrop ? 'reduced' : 'increased'} text-xs font-numeric`}>
+            <span className="price-signal-badge">
+              {priceSignal.isDrop ? '▼' : '▲'} {formatNairaShort(priceSignal.amount)} ({priceSignal.percent}%)
+            </span>
+            <span className="price-signal-time text-secondary"> {priceSignal.daysSince}d ago</span>
+          </div>
+        )}
       </section>
 
       <footer className="card-footer">
