@@ -73,8 +73,8 @@ export function ToastProvider({ children }: ToastProviderProps) {
           zIndex: 2000,
           pointerEvents: 'none'
         }}
-        role="live"
-        aria-live="assertive"
+        role="log"
+        aria-live="polite"
       >
         {toasts.map((toast) => {
           let AccentColor = 'var(--color-amber-400)';
