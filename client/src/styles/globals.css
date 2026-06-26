@@ -1718,3 +1718,48 @@ textarea:focus-visible {
   }
 }
 
+/* ── Route Page Entry & Card Stagger Animations ── */
+@keyframes pageEntry {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition-wrapper {
+  animation: pageEntry var(--duration-slow) var(--ease-default) both;
+  width: 100%;
+}
+
+@keyframes cardEntry {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.0);
+  }
+}
+
+.listings-grid > * {
+  animation: cardEntry var(--duration-normal) var(--ease-default) both;
+}
+
+.listings-grid > *:nth-child(1) { animation-delay: 0ms; }
+.listings-grid > *:nth-child(2) { animation-delay: 40ms; }
+.listings-grid > *:nth-child(3) { animation-delay: 80ms; }
+.listings-grid > *:nth-child(4) { animation-delay: 120ms; }
+.listings-grid > *:nth-child(5) { animation-delay: 160ms; }
+.listings-grid > *:nth-child(6) { animation-delay: 200ms; }
+.listings-grid > *:nth-child(7) { animation-delay: 240ms; }
+.listings-grid > *:nth-child(8) { animation-delay: 280ms; }
+.listings-grid > *:nth-child(9) { animation-delay: 320ms; }
+.listings-grid > *:nth-child(10) { animation-delay: 360ms; }
+.listings-grid > *:nth-child(11) { animation-delay: 400ms; }
+.listings-grid > *:nth-child(12) { animation-delay: 440ms; }
+
