@@ -1,5 +1,5 @@
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Line, Legend } from 'recharts';
-import { TrendWeek } from '../../types/api';
+import type { TrendWeek } from '../../types/api';
 import { formatDate, formatNaira, formatNairaShort } from '../../utils/format';
 
 export interface TrendChartProps {

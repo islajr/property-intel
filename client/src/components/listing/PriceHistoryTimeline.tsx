@@ -1,4 +1,4 @@
-import { PriceHistoryResponse } from '../../types/api';
+import type { PriceHistoryResponse } from '../../types/api';
 import { formatDate, formatNaira, formatNairaShort } from '../../utils/format';
 
 export interface PriceHistoryTimelineProps {

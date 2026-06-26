@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ExternalLink, BedDouble, Bath, ArrowLeft, Clock, User, MapPin } from 'lucide-react';
+import { ExternalLink, ArrowLeft, User, MapPin } from 'lucide-react';
 import { listings } from '../api';
 import PriceHistoryTimeline from '../components/listing/PriceHistoryTimeline';
 import PriceHistoryChart from '../components/listing/PriceHistoryChart';

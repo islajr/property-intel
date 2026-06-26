@@ -1,5 +1,5 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
-import { PriceHistoryResponse } from '../../types/api';
+import type { PriceHistoryResponse } from '../../types/api';
 import { formatDate, formatNaira, formatNairaShort } from '../../utils/format';
 
 export interface PriceHistoryChartProps {

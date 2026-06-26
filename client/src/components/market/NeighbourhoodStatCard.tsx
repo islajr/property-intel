@@ -4,6 +4,7 @@ import { market } from '../../api';
 import { formatNaira } from '../../utils/format';
 import Badge from '../primitives/Badge';
 import Skeleton from '../primitives/Skeleton';
+import { Sparkline } from './Sparkline';
 
 export interface NeighbourhoodStatCardProps {
   name: string;
@@ -133,8 +134,8 @@ export function NeighbourhoodStatCard({ name, city, initialStats }: Neighbourhoo
         </div>
       </div>
 
-      {/* Sparkline placeholder for B-13 */}
-      <div className="sparkline-container-stub mt-4" style={{ height: 30 }} />
+      {/* Sparkline trend (lazy-loaded via Intersection Observer) */}
+      <Sparkline neighbourhood={name} />
     </article>
   );
 }

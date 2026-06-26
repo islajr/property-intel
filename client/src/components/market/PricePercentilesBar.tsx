@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MarketPercentiles } from '../../types/api';
+import type { MarketPercentiles } from '../../types/api';
 import { formatNaira, formatNairaShort } from '../../utils/format';
 
 export interface PricePercentilesBarProps {

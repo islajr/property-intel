@@ -31,12 +31,16 @@ export default function Market() {
     refetch,
   } = useInfiniteQuery({
     queryKey: ['market', 'neighbourhoods-list', sort],
-    queryFn: ({ pageParam }) =>
-      market.getNeighbourhoods({
+    queryFn: ({ pageParam }) => {
+      const params: any = {
         sort_by: sort as any,
         limit: 12,
-        cursor: pageParam,
-      }),
+      };
+      if (pageParam !== undefined) {
+        params.cursor = pageParam;
+      }
+      return market.getNeighbourhoods(params);
+    },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.meta.has_more ? lastPage.meta.next_cursor || undefined : undefined,
