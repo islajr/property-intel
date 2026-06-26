@@ -110,38 +110,70 @@ export default function Navigation() {
         </button>
       </div>
 
-      {/* Mobile Drawer (Basic layout, will be polished in Wave D) */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="mobile-drawer">
-          <div className="mobile-drawer-links">
-            <Link to="/market" className="mobile-drawer-item" onClick={() => setMobileMenuOpen(false)}>
-              Market
-            </Link>
-            <Link to="/listings" className="mobile-drawer-item" onClick={() => setMobileMenuOpen(false)}>
-              Listings
-            </Link>
-            {isAuthenticated && (
-              <Link to="/alerts" className="mobile-drawer-item" onClick={() => setMobileMenuOpen(false)}>
-                My Alerts
+          <div className="mobile-drawer-content flex flex-col justify-between h-full w-full">
+            <div className="mobile-drawer-links flex flex-col gap-1">
+              <Link 
+                to="/market" 
+                className="mobile-drawer-item flex items-center" 
+                style={{ minHeight: 48 }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Market
               </Link>
-            )}
-            
-            <div className="mobile-drawer-divider" />
-            
-            {isAuthenticated ? (
-              <button onClick={() => { handleSignOut(); setMobileMenuOpen(false); }} className="mobile-drawer-btn-destructive">
-                Sign out
-              </button>
-            ) : (
-              <div className="mobile-drawer-auth-actions">
-                <Link to="/login" className="mobile-drawer-login" onClick={() => setMobileMenuOpen(false)}>
-                  Login
+              <Link 
+                to="/listings" 
+                className="mobile-drawer-item flex items-center" 
+                style={{ minHeight: 48 }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Listings
+              </Link>
+              {isAuthenticated && (
+                <Link 
+                  to="/alerts" 
+                  className="mobile-drawer-item flex items-center" 
+                  style={{ minHeight: 48 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My Alerts
                 </Link>
-                <Link to="/register" className="mobile-drawer-register" onClick={() => setMobileMenuOpen(false)}>
-                  Register
-                </Link>
-              </div>
-            )}
+              )}
+            </div>
+            
+            <div className="mobile-drawer-actions mt-auto w-full">
+              <div className="mobile-drawer-divider" />
+              {isAuthenticated ? (
+                <button 
+                  onClick={() => { handleSignOut(); setMobileMenuOpen(false); }} 
+                  className="mobile-drawer-btn-destructive w-full flex items-center justify-center"
+                  style={{ minHeight: 48 }}
+                >
+                  Sign out
+                </button>
+              ) : (
+                <div className="mobile-drawer-auth-actions flex flex-col gap-3 w-full">
+                  <Link 
+                    to="/login" 
+                    className="mobile-drawer-login w-full flex items-center justify-center" 
+                    style={{ minHeight: 48 }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="mobile-drawer-register w-full flex items-center justify-center text-inverse font-semibold" 
+                    style={{ minHeight: 48 }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
